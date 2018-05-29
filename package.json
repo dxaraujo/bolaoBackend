@@ -18,7 +18,7 @@
 	},
 	"scripts": {
 		"dev": "nodemon",
-		"start2": "nodemon",
+		"start": "nodemon",
 		"start2": "pm2 start src/server.js --name bolao"
 	}
 }
