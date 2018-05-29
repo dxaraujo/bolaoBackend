@@ -1,2 +1,2 @@
 const mongoose = require('mongoose')
-module.exports = mongoose.connect('mongodb://dxaraujo:1211968Dxa@ds137740.mlab.com:37740/bolaomesa5')
+module.exports = mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1/bolaomesa5')
