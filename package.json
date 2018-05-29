@@ -18,6 +18,6 @@
 	},
 	"scripts": {
 		"dev": "nodemon",
-		"prod": "pm2 start src/server.js --name bolao"
+		"start": "pm2 start src/server.js --name bolao"
 	}
 }
