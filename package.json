@@ -1,0 +1,23 @@
+{
+	"name": "backend",
+	"version": "1.0.0",
+	"main": "src/server.js",
+	"license": "MIT",
+	"dependencies": {
+		"bcryptjs": "^2.4.3",
+		"body-parser": "^1.18.2",
+		"cors": "^2.8.4",
+		"express": "^4.16.3",
+		"express-query-int": "^3.0.0",
+		"jsonwebtoken": "^8.2.1",
+		"mongoose": "^5.0.17",
+		"pm2": "^2.10.3"
+	},
+	"devDependencies": {
+		"nodemon": "^1.17.4"
+	},
+	"scripts": {
+		"dev": "nodemon",
+		"prod": "pm2 start src/server.js --name bolao"
+	}
+}
