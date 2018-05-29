@@ -11,11 +11,10 @@
 		"express-query-int": "^3.0.0",
 		"jsonwebtoken": "^8.2.1",
 		"mongoose": "^5.0.17",
-		"pm2": "^2.10.3"
-	},
-	"devDependencies": {
+		"pm2": "^2.10.3",
 		"nodemon": "^1.17.4"
 	},
+	"devDependencies": {},
 	"scripts": {
 		"dev": "nodemon",
 		"start": "nodemon",
