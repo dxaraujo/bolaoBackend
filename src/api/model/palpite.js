@@ -13,7 +13,7 @@ const palpiteSchema = new mongoose.Schema({
 		type: Number,
 		required: true
 	},
-	palpitePartida: {
+	resultadoPartida: {
 		type: String,
 		required: true
 	}
