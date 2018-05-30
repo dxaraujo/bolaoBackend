@@ -34,6 +34,24 @@ router.delete('/:id', (req, res, next) => {
 	})
 })
 
+router.get('/:userId/:fase/montarpalpites', (req, res, next) => {
+	Palpite.find({ 'user._id': userId, 'partida.fase': fase  }, (err, palpites) => {
+		if (!err) {
+			if (palpites && palpites.length > 0) {
+				respondOrErr(res, next, 500, err, 200, { data })
+			} else {
+				montarPalpites()
+			}
+		} else {
+			respondOrErr(res, next, 500, err, 200, { data })
+		}
+	})
+})
+
+const montarPalpites = (partidas) => {
+	console.log('Chegou')
+}
+
 router.use(handlerError)
 
 exports = module.exports = router
