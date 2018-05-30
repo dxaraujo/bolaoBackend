@@ -31,6 +31,11 @@ const userSchema = new mongoose.Schema({
 			placarTimeVencedor: 0,
 			placarGol: 0
 		}
+	},
+	isAdmin: {
+		type: Boolean,
+		required: true,
+		default: false
 	}
 })
 
