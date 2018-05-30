@@ -1,7 +1,7 @@
 const express = require('express')
 const Palpite = require('../model/palpite')
 const Partidas = require('../model/partida')
-const { respondOrErr, handlerError } = require('../../util/serviceUtils')
+const { respondOrErr, respondErr, handlerError } = require('../../util/serviceUtils')
 
 const router = express.Router()
 
@@ -44,7 +44,7 @@ router.get('/:userId/:fase/montarpalpites', (req, res, next) => {
 				respondOrErr(res, next, 500, err, 200, { data: palpites })
 			}
 		} else {
-			respondOrErr(res, next, 500, err, 200, { data: palpites })
+			respondErr(res, next, 500, err)
 		}
 	})
 })

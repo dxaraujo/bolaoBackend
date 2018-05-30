@@ -9,6 +9,11 @@ const respondOrErr = (res, next, errStatusCode, err, statusCode, data) => {
 	}
 };
 
+const respondErr = (res, next, errStatusCode, err) => {
+	err.statusCode = errStatusCode
+	next(err)
+};
+
 const handlerError = (err, req, res, next) => {
 	const message = err.message
 	res.status(err.statusCode).json({ message });
@@ -58,4 +63,4 @@ const createService = (model) => {
 	return router
 }
 
-module.exports = { createService, respondOrErr, handlerError }
+module.exports = { createService, respondOrErr, respondErr, handlerError }
