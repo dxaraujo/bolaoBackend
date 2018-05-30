@@ -2,11 +2,13 @@ const mongoose = require('mongoose')
 
 const faseSchema = new mongoose.Schema({
 	nome: {
-		type: mongoose.Schema.ObjectId,
+		type: String,
 		required: true
 	},
 	status: {
-
+		type: Boolean,
+		required: true,
+		default: false
 	}
 })
 

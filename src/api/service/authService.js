@@ -43,8 +43,8 @@ const login = (req, res) => {
 			console.log(err)
 		} else if (user && bcrypt.compareSync(password, user.password)) {
 			const token = jwt.sign(user.toJSON(), env.authSecret, { expiresIn: "1 day" })
-			const { name, username, avatar, palpites, pontuacao } = user
-			res.json({ name, username, avatar, palpites, pontuacao, token })
+			const { name, username, avatar } = user
+			res.json({ name, username, avatar, token })
 		} else {
 			return res.status(400).send({
 				errors: ['Usuário/Senha inválidos']

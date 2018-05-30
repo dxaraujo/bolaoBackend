@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const Pontuacao = require('./pontuacao')
 
 const palpiteSchema = new mongoose.Schema({
 	user: {
@@ -20,6 +21,17 @@ const palpiteSchema = new mongoose.Schema({
 	resultadoPartida: {
 		type: String,
 		required: true
+	},
+	pontuacao: {
+		type: Pontuacao.schema,
+		required: false,
+		default: {
+			total: 0,
+			placarCheio: 0,
+			placarTimeVencedorComGol: 0,
+			placarTimeVencedor: 0,
+			placarGol: 0
+		}
 	}
 })
 

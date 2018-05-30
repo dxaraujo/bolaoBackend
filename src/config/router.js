@@ -1,7 +1,5 @@
 const express = require('express')
-
-const createService = require('../util/createService')
-const { authService, userService } = require('../api')
+const { authService, faseService, palpiteService, partidaService, timeService, userService } = require('../api')
 
 /*
  * Rotas abertas
@@ -16,8 +14,10 @@ oapi.post('/validateToken', authService.validateToken)
  */
 const api = express.Router()
 api.use(authService.auth)
-api.use('/time', createService(Time))
-api.use('/partida', createService(Partida))
+api.use('/fase', faseService)
+api.use('/palpite', palpiteService)
+api.use('/partida', partidaService)
+api.use('/time', timeService)
 api.use('/user', userService)
 
 module.exports = { api, oapi }

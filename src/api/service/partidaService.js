@@ -1,35 +1,35 @@
 const express = require('express')
-const Palpite = require('../model/palpite')
+const Partida = require('../model/partida')
 const { respondOrErr, handlerError } = require('../../util/serviceUtils')
 
 const router = express.Router()
 
 router.get('/', (req, res, next) => {
-	Palpite.find(req.query, (err, data) => {
+	Partida.find(req.query, (err, data) => {
 		respondOrErr(res, next, 500, err, 200, { data })
 	})
 })
 
 router.get('/:id', (req, res, next) => {
-	Palpite.findById(req.params.id, (err, data) => {
+	Partida.findById(req.params.id, (err, data) => {
 		respondOrErr(res, next, 500, err, 200, { data })
 	});
 })
 
 router.post('/', (req, res, next) => {
-	Palpite.create(req.body, (err, data) => {
+	Partida.create(req.body, (err, data) => {
 		respondOrErr(res, next, 400, err, 201, { data })
 	})
 })
 
 router.put('/:id', (req, res, next) => {
-	Palpite.findByIdAndUpdate(req.params.id, req.body, { new: true }, (err, data) => {
+	Partida.findByIdAndUpdate(req.params.id, req.body, { new: true }, (err, data) => {
 		respondOrErr(res, next, 500, err, 200, { data })
 	})
 })
 
 router.delete('/:id', (req, res, next) => {
-	Palpite.findByIdAndRemove(req.params.id, req.body, (err, data) => {
+	Partida.findByIdAndRemove(req.params.id, req.body, (err, data) => {
 		respondOrErr(res, next, 500, err, 200, { data })
 	})
 })

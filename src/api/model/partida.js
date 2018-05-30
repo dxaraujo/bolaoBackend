@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const Resultado = require('./resultado')
 
 const partidaSchema = new mongoose.Schema({
 	fase: {
