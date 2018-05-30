@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const Palpite = require('./palpite')
 
 const userSchema = new mongoose.Schema({
-	nome: {
+	name: {
 		type: String,
 		required: true
 	},
