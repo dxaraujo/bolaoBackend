@@ -25,7 +25,7 @@ const partidaSchema = new mongoose.Schema({
 			'GRUPO F',
 			'GRUPO G',
 			'GRUPO H',
-			''
+			'GRUPO ÚNICO'
 		]
 	},
 	rodada: {
@@ -35,7 +35,7 @@ const partidaSchema = new mongoose.Schema({
 			'1ª RODADA',
 			'2ª RODADA',
 			'3ª RODADA',
-			''
+			'RODADA ÚNICA'
 		]
 	},
 	data: {

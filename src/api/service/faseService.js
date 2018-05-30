@@ -2,6 +2,7 @@ const express = require('express')
 const Fase = require('../model/fase')
 const { respondOrErr, handlerError } = require('../../util/serviceUtils')
 
+
 const router = express.Router()
 
 router.get('/', (req, res, next) => {
