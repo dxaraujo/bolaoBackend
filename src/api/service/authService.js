@@ -44,7 +44,7 @@ const login = (req, res) => {
 		} else if (user && bcrypt.compareSync(password, user.password)) {
 			delete user.password
 			const token = jwt.sign(user.toJSON(), env.authSecret, { expiresIn: "1 day" })
-			res.json({ token, user: user.toJSON() })
+			res.json({ token })
 		} else {
 			return res.status(400).send({
 				errors: ['Usuário/Senha inválidos']
