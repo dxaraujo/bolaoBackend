@@ -18,12 +18,7 @@ const userSchema = new mongoose.Schema({
 	},
 	avatar: {
 		data: Buffer,
-		contentType: String	
-	},
-	palpites: {
-		type: [Palpite.schema],
-		required: true,
-		default: []
+		contentType: String
 	}
 })
 

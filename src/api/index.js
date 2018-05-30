@@ -1,6 +1,5 @@
-const Time = require('./model/time')
-const Partida = require('./model/partida')
-
 const authService = require('./service/authService')
+const userService = require('./service/userService')
+const timeService = require('./service/timeService')
 
-module.exports = { Time, Partida, authService }
+module.exports = { authService, userService }

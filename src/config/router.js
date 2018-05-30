@@ -1,7 +1,7 @@
 const express = require('express')
 
 const createService = require('../util/createService')
-const { Time, Partida, authService } = require('../api')
+const { authService, userService } = require('../api')
 
 /*
  * Rotas abertas
@@ -18,5 +18,6 @@ const api = express.Router()
 api.use(authService.auth)
 api.use('/time', createService(Time))
 api.use('/partida', createService(Partida))
+api.use('/user', userService)
 
 module.exports = { api, oapi }

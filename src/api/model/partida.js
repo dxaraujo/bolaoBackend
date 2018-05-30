@@ -39,11 +39,6 @@ const partidaSchema = new mongoose.Schema({
 			''
 		]
 	},
-	liberado: {
-		type: Boolean,
-		required: false,
-		default: false
-	},
 	data: {
 		type: Date,
 		required: true
@@ -52,13 +47,21 @@ const partidaSchema = new mongoose.Schema({
 		type: mongoose.Schema.ObjectId,
 		required: true
 	},
+	placarTimeA: {
+		type: Number,
+		required: true
+	},
 	timeB: {
 		type: mongoose.Schema.ObjectId,
 		required: true
 	},
-	resultado: {
-		type: Resultado.schema,
-		required: false
+	placarTimeB: {
+		type: Number,
+		required: true
+	},
+	resultadoPartida: {
+		type: String,
+		required: true
 	}
 })
 

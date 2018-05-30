@@ -1,6 +1,10 @@
 const mongoose = require('mongoose')
 
 const palpiteSchema = new mongoose.Schema({
+	user: {
+		type: mongoose.Schema.ObjectId,
+		required: true
+	},
 	partida: {
 		type: mongoose.Schema.ObjectId,
 		required: true
@@ -13,7 +17,7 @@ const palpiteSchema = new mongoose.Schema({
 		type: Number,
 		required: true
 	},
-	palpitePartida: {
+	resultadoPartida: {
 		type: String,
 		required: true
 	}
