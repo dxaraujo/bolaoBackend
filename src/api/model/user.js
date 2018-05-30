@@ -2,11 +2,11 @@ const mongoose = require('mongoose')
 const Palpite = require('./palpite')
 
 const userSchema = new mongoose.Schema({
-	username: {
+	nome: {
 		type: String,
 		required: true
 	},
-	email: {
+	username: {
 		type: String,
 		required: true
 	},
