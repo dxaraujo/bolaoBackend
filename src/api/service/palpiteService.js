@@ -1,4 +1,5 @@
 const express = require('express')
+const ObjectId = require('mongoose').mongo.ObjectId
 const PalpiteModel = require('../model/palpite')
 const PartidaModel = require('../model/partida')
 const TimeModel = require('../model/time')
@@ -39,9 +40,10 @@ router.delete('/:id', (req, res, next) => {
 router.get('/:userId/:fase/montarpalpites', (req, res, next) => {
 	const userId = req.params.userId
 	const fase = req.params.fase
-	PalpiteModel.find({user: userId, 'partida.fase': fase}, (err, data) => {
+	PalpiteModel.find({'user': userId}, (err, data) => {
 		if (!err) {
 			PartidaModel.find({ fase }, (err, partidas) => {
+				partidas = filtrarPartidasPorFase(partidas, fase)
 				TimeModel.find({}, (err, times) => {
 					let palpites = []
 					partidas.forEach(partida => {
@@ -64,6 +66,16 @@ router.get('/:userId/:fase/montarpalpites', (req, res, next) => {
 		}
 	})
 })
+
+const filtrarPartidasPorFase = (partidas, fase) => {
+	const part = []
+	partidas.forEach(partida => {
+		if (partida.fase == fase) {
+			part.push(partida)
+		}
+	})
+	return part
+}
 
 const popularTimes = (partidas, times) => {
 	const part = []
