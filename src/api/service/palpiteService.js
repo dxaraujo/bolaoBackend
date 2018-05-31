@@ -38,7 +38,7 @@ router.delete('/:id', (req, res, next) => {
 })
 
 router.put('/:user/updatePalpites', (req, res, next) => {
-	PalpiteModel.updateMany(req.params.user, req.body, { multi: true, new: true}, (err, data) => {
+	PalpiteModel.updateMany({ user: req.params.user}, req.body, { multi: true, new: true}, (err, data) => {
 		respondOrErr(res, next, 500, err, 200, { data })
 	})
 })
