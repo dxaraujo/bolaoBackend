@@ -41,10 +41,12 @@ router.put('/:user/updatePalpites', (req, res, next) => {
 	const palpites = montarPalpiteUpdate(req.body)
 	palpites.forEach(palpite => {
 		Palpite.findByIdAndUpdate({ _id: palpite._id}, palpite, { new: true }, (err, palp) => {
-			console.log(err)
+			if (err && err == null) {
+				respondErr(res, next, 500, err)
+			}
 		})
 	})
-	respondOrErr(res, next, 500, {}, 200, { data: 'OK' })
+	res.status(200).json({ data: 'OK' });
 })
 
 router.get('/:user/:fase/montarpalpites', (req, res, next) => {
