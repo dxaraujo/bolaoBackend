@@ -47,8 +47,6 @@ router.put('/:user/updatePalpites', (req, res, next) => {
 	res.status(200).json({ data: 'OK' });
 })
 
-const forPalpites = async 
-
 router.get('/:user/:fase/montarpalpites', (req, res, next) => {
 	const user = req.params.user
 	const fase = req.params.fase
