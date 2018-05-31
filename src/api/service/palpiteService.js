@@ -39,14 +39,18 @@ router.delete('/:id', (req, res, next) => {
 
 router.put('/:user/updatePalpites', (req, res, next) => {
 	const palpites = montarPalpiteUpdate(req.body)
-	palpites.forEach(palpite => {
-		Palpite.findByIdAndUpdate({ _id: palpite._id}, palpite, { new: true }, (err, palp) => {
+	const result =[]
+	palpites.forEach(async palpite => {
+		const query = Palpite.findByIdAndUpdate({ _id: palpite._id}, palpite, { new: true })
+		await query.exec((err, palp) => {
 			if (err && err == null) {
 				respondErr(res, next, 500, err)
+			} else {
+				result.push(palp)
 			}
 		})
 	})
-	res.status(200).json({ data: 'OK' });
+	res.status(200).json({ data: result });
 })
 
 router.get('/:user/:fase/montarpalpites', (req, res, next) => {
