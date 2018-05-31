@@ -41,8 +41,7 @@ router.put('/:user/updatePalpites', (req, res, next) => {
 	const palpites = montarPalpiteUpdate(req.body)
 	const result =[]
 	palpites.forEach(async palpite => {
-		const query = Palpite.findByIdAndUpdate({ _id: palpite._id}, palpite, { new: true })
-		const palp = await query.exec()
+		const palp = await Palpite.findByIdAndUpdate({ _id: palpite._id}, palpite, { new: true }).exec()
 		result.push(palp)
 	})
 	res.status(200).json({ data: result });
