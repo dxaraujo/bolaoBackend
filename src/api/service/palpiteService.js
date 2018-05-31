@@ -42,13 +42,12 @@ router.put('/:user/updatePalpites', async (req, res, next) => {
 	const result =[]
 	palpites.forEach(palpite => {
 		const query = Palpite.findByIdAndUpdate({ _id: palpite._id}, palpite, { new: true })
-		await query.exec((err, palp) => {
+		const palp = await query.exec((err, palp) => {
 			if (err && err == null) {
 				respondErr(res, next, 500, err)
-			} else {
-				result.push(palp)
 			}
 		})
+		result.push(palp)
 	})
 	res.status(200).json({ data: result });
 })
