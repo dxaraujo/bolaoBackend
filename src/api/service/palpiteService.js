@@ -42,7 +42,6 @@ router.put('/:user/updatePalpites', (req, res, next) => {
 	palpites.forEach(palpite => {
 		Palpite.findByIdAndUpdate({ _id: palpite._id}, palpite, { new: true }, (err, palp) => {
 			console.log(err)
-			console.log(palp)
 		})
 	})
 	respondOrErr(res, next, 500, {}, 200, { data: 'OK' })
