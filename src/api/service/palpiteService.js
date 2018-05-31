@@ -40,7 +40,7 @@ router.delete('/:id', (req, res, next) => {
 router.put('/:user/updatePalpites', (req, res, next) => {
 	const palpites = montarPalpiteUpdate(req.body)
 	palpites.forEach(palpite => {
-		Palpite.findByIdAndUpdate({ _id: palpite._id}, palpite, { new: true }).exec((err, palp) => {
+		Palpite.findByIdAndUpdate({ _id: palpite._id}, palpite, { new: true }, (err, palp) => {
 			console.log('chamou')
 		})
 	})
