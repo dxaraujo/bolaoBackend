@@ -8,6 +8,7 @@ const oapi = express.Router()
 oapi.post('/login', authService.login)
 oapi.post('/signup', authService.signup)
 oapi.post('/validateToken', authService.validateToken)
+oapi.post('/registerfacebookuser', authService.registerFacebookUser)
 
 /**
  * Rotas seguras

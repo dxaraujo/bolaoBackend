@@ -18,8 +18,8 @@ const userSchema = new mongoose.Schema({
 		required: true
 	},
 	avatar: {
-		data: Buffer,
-		contentType: String
+		type: String,
+		required: false
 	},
 	pontuacao: {
 		type: Pontuacao.schema,
@@ -31,6 +31,10 @@ const userSchema = new mongoose.Schema({
 			placarTimeVencedor: 0,
 			placarGol: 0
 		}
+	},
+	facebookId: {
+		type: String,
+		required: false
 	},
 	isAdmin: {
 		type: Boolean,

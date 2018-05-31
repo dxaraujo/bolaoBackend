@@ -33,6 +33,21 @@ const auth = (req, res, next) => {
 	}
 }
 
+const registerFacebookUser = (req, res) => {
+	const user = req.body
+	User.findOne({ username: user.username }, (err, user) => {
+		if (err) {
+			console.log(err)
+		} else {
+			if (user) {
+				login(req, res)
+			} else {
+				signup(req, res)
+			}
+		}
+	})
+}
+
 const login = (req, res) => {
 
 	const username = req.body.username || ''
@@ -68,6 +83,8 @@ const signup = (req, res) => {
 	const username = req.body.username || ''
 	const password = req.body.password || ''
 	const confirmPassword = req.body.confirmPassword || ''
+	const facebookId = req.body.facebookId || ''
+	const avatar = req.body.avatar || ''
 
 	if (!password.match(passwordRegex)) {
 		return res.status(400).send({
@@ -94,7 +111,7 @@ const signup = (req, res) => {
 				errors: ['Usuário já cadastrado.']
 			})
 		} else {
-			const newUser = new User({ name, username, password: passwordHash })
+			const newUser = new User({ name, username, password: passwordHash, facebookId, avatar })
 			newUser.save(err => {
 				if (err) {
 					console.log(err)
@@ -106,4 +123,4 @@ const signup = (req, res) => {
 	})
 }
 
-module.exports = { auth, login, signup, validateToken }
+module.exports = { auth, login, signup, validateToken, registerFacebookUser }
