@@ -37,10 +37,10 @@ router.delete('/:id', (req, res, next) => {
 	})
 })
 
-router.put('/:user/updatePalpites', (req, res, next) => {
+router.put('/:user/updatePalpites', async (req, res, next) => {
 	const palpites = montarPalpiteUpdate(req.body)
 	const result =[]
-	palpites.forEach(async palpite => {
+	palpites.forEach(palpite => {
 		const query = Palpite.findByIdAndUpdate({ _id: palpite._id}, palpite, { new: true })
 		await query.exec((err, palp) => {
 			if (err && err == null) {
