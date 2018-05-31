@@ -12,15 +12,15 @@ const palpiteSchema = new mongoose.Schema({
 	},
 	placarTimeA: {
 		type: Number,
-		required: true
+		required: false
 	},
 	placarTimeB: {
 		type: Number,
-		required: true
+		required: false
 	},
 	resultadoPartida: {
 		type: String,
-		required: true
+		required: false
 	},
 	pontuacao: {
 		type: Pontuacao.schema,

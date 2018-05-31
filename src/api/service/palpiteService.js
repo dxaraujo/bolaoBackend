@@ -1,56 +1,131 @@
 const express = require('express')
-const Palpite = require('../model/palpite')
-const Partidas = require('../model/partida')
+const PalpiteModel = require('../model/palpite')
+const PartidaModel = require('../model/partida')
+const TimeModel = require('../model/time')
 const { respondOrErr, respondErr, handlerError } = require('../../util/serviceUtils')
 
 const router = express.Router()
 
 router.get('/', (req, res, next) => {
-	Palpite.find(req.query, (err, data) => {
+	PalpiteModel.find(req.query, (err, data) => {
 		respondOrErr(res, next, 500, err, 200, { data })
 	})
 })
 
 router.get('/:id', (req, res, next) => {
-	Palpite.findById(req.params.id, (err, data) => {
+	PalpiteModel.findById(req.params.id, (err, data) => {
 		respondOrErr(res, next, 500, err, 200, { data })
 	});
 })
 
 router.post('/', (req, res, next) => {
-	Palpite.create(req.body, (err, data) => {
+	PalpiteModel.create(req.body, (err, data) => {
 		respondOrErr(res, next, 400, err, 201, { data })
 	})
 })
 
 router.put('/:id', (req, res, next) => {
-	Palpite.findByIdAndUpdate(req.params.id, req.body, { new: true }, (err, data) => {
+	PalpiteModel.findByIdAndUpdate(req.params.id, req.body, { new: true }, (err, data) => {
 		respondOrErr(res, next, 500, err, 200, { data })
 	})
 })
 
 router.delete('/:id', (req, res, next) => {
-	Palpite.findByIdAndRemove(req.params.id, req.body, (err, data) => {
+	PalpiteModel.findByIdAndRemove(req.params.id, req.body, (err, data) => {
 		respondOrErr(res, next, 500, err, 200, { data })
 	})
 })
 
 router.get('/:userId/:fase/montarpalpites', (req, res, next) => {
-	Palpite.find({ 'user._id': userId, 'partida.fase': fase  }, (err, palpites) => {
+	const userId = req.params.userId
+	const fase = req.params.fase
+	PalpiteModel.find({user: userId, 'partida.fase': fase}, (err, data) => {
 		if (!err) {
-			if (palpites && palpites.length > 0) {
-				respondOrErr(res, next, 500, err, 200, { data: palpites })
-			} else {
-				respondOrErr(res, next, 500, err, 200, { data: palpites })
-			}
+			PartidaModel.find({ fase }, (err, partidas) => {
+				TimeModel.find({}, (err, times) => {
+					let palpites = []
+					partidas.forEach(partida => {
+						palpites.push({user: userId, partida: partida._id})
+					})
+					if (data && data.length > 0) {
+						const grupos = montarPalpites(data, partidas, times)
+						respondOrErr(res, next, 500, err, 200, { data: grupos })		
+					} else {
+						PalpiteModel.insertMany(palpites, (err, palpites) => {
+							const grupos = montarPalpites(palpites, partidas, times)
+							respondOrErr(res, next, 500, err, 200, { data: grupos })		
+						})
+					}
+				})
+			}).sort( { grupo: 1, rodada: 1, data: 1 } )
+			
 		} else {
 			respondErr(res, next, 500, err)
 		}
 	})
 })
 
-const montarPalpites = (partidas) => {
-	console.log('Chegou')
+const popularTimes = (partidas, times) => {
+	const part = []
+	partidas.forEach(partida => {
+		const timeA = times.find(time => time._id.equals(partida.timeA))
+		const timeB = times.find(time => time._id.equals(partida.timeB))
+		part.push({...partida._doc, timeA, timeB})
+		
+	})
+	return part
+}
+
+const popularPartidas = (palpites, partidas, times) => {
+	partidas = popularTimes(partidas, times)
+	const palp = []
+	palpites.forEach(palpite => {
+		const partida = partidas.find(partida => partida._id.equals(palpite.partida))
+		palp.push({...palpite._doc, partida})
+		
+	})
+	return palp
+}
+
+const montarPalpites = (palpites, partidas, times) => {
+	palpites = popularPartidas(palpites, partidas, times)
+	let idx = 0
+	let gidx = 0
+	let grupo = { nome : palpites[0].partida.grupo, rodadas: [] }
+	let grupos = [grupo]
+	let ridx = 0
+	let rodada = { nome : palpites[0].partida.rodada, palpites: [] }
+	let rodadas = [rodada]
+	while(idx < palpites.length) {
+		let partida = palpites[idx].partida
+		if (partida.grupo === grupos[gidx].nome) {
+			if(partida.rodada === rodadas[ridx].nome) {
+				//delete palpites[idx].partida2
+				rodadas[ridx].palpites.push({...palpites[idx++]})
+			} else {
+				// NOVA RODADA PARA O MESMO GRUPO
+				++ridx
+				rodada = { nome : palpites[idx].partida.rodada, palpites: [] }
+				rodadas.push(rodada)
+				//delete palpites[idx].partida2
+				rodadas[ridx].palpites.push({...palpites[idx++]})
+			}
+		} else {
+			//NOVO GRUPO
+			grupos[gidx].rodadas = rodadas
+			++gidx
+			grupo = { nome : palpites[idx].partida.grupo, rodadas: [] }
+			grupos.push(grupo)
+			
+			
+			// NOVA RODADA
+			ridx = 0
+			rodada = { nome : palpites[idx].partida.rodada, palpites: [] }
+			rodadas = [rodada]
+		}
+	}
+	grupos[gidx].rodadas = rodadas
+	return grupos
 }
 
 router.use(handlerError)
