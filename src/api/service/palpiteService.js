@@ -38,6 +38,9 @@ router.delete('/:id', (req, res, next) => {
 })
 
 router.put('/:user/updatePalpites', (req, res, next) => {
+	console.log(req.body)
+	const palpites = popularPalpites(req.body)
+	console.log(palpites)
 	PalpiteModel.updateMany({ user: req.params.user}, req.body, { multi: true, new: true}, (err, data) => {
 		respondOrErr(res, next, 500, err, 200, { data })
 	})
@@ -72,6 +75,14 @@ router.get('/:user/:fase/montarpalpites', (req, res, next) => {
 		}
 	})
 })
+
+const popularPalpites = palpites => {
+	const palp = []
+	palpites.forEach(palpite => {
+		palp.push({placarTimeA: palpite.placarTimeA, placarTimeB: palpite.placarTimeB})
+	})
+	return palp
+}
 
 const filtrarPartidasPorFase = (partidas, fase) => {
 	const part = []
