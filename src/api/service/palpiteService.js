@@ -37,17 +37,23 @@ router.delete('/:id', (req, res, next) => {
 	})
 })
 
-router.get('/:userId/:fase/montarpalpites', (req, res, next) => {
-	const userId = req.params.userId
+router.put('/:user/updatePalpites', (req, res, next) => {
+	PalpiteModel.updateMany(req.params.user, req.body, { multi: true, new: true}, (err, data) => {
+		respondOrErr(res, next, 500, err, 200, { data })
+	})
+})
+
+router.get('/:user/:fase/montarpalpites', (req, res, next) => {
+	const user = req.params.user
 	const fase = req.params.fase
-	PalpiteModel.find({'user': userId}, (err, data) => {
+	PalpiteModel.find({user}, (err, data) => {
 		if (!err) {
 			PartidaModel.find({ fase }, (err, partidas) => {
 				partidas = filtrarPartidasPorFase(partidas, fase)
 				TimeModel.find({}, (err, times) => {
 					let palpites = []
 					partidas.forEach(partida => {
-						palpites.push({user: userId, partida: partida._id})
+						palpites.push({user, partida: partida._id})
 					})
 					if (data && data.length > 0) {
 						const grupos = montarPalpites(data, partidas, times)
