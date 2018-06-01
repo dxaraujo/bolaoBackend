@@ -23,7 +23,7 @@ router.post('/', (req, res, next) => {
 })
 
 router.put('/:id', (req, res, next) => {
-	User.findByIdAndUpdate(req.params.id, req.body, { new: true }, (err, data) => {
+	User.findByIdAndUpdate(req.params.id, { isAdmin: req.body.isAdmin }, { new: true }, (err, data) => {
 		respondOrErr(res, next, 500, err, 200, { data })
 	})
 })
