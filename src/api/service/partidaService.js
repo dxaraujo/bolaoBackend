@@ -1,4 +1,5 @@
 const express = require('express')
+const moment = require('moment')
 const Partida = require('../model/partida')
 const { respondOrErr, handlerError } = require('../../util/serviceUtils')
 
@@ -11,8 +12,16 @@ router.get('/', (req, res, next) => {
 })
 
 router.get('/resultado', (req, res, next) => {
-	Partida.find({ data: { $gt: new Date() } }, req.body, (err, data) => {
-		respondOrErr(res, next, 500, err, 200, { data })
+	Partida.find({}, req.body, (err, data) => {
+		if (data) {
+			let partidas = []
+			data.forEach(partida => {
+				if (moment(partida.data, 'YYYY-MM-DDThh:mm:ss').isBefore(new Date())) {
+					partidas.push(partida)
+				}
+			})
+		}
+		respondOrErr(res, next, 500, err, 200, { partidas })
 	})
 })
 
