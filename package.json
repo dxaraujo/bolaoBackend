@@ -4,7 +4,6 @@
 	"main": "src/server.js",
 	"license": "MIT",
 	"dependencies": {
-		"async": "^2.6.1",
 		"bcryptjs": "^2.4.3",
 		"body-parser": "^1.18.2",
 		"co": "^4.6.0",
@@ -14,13 +13,13 @@
 		"jsonwebtoken": "^8.2.1",
 		"moment": "^2.22.2",
 		"mongoose": "^5.0.17",
-		"nodemon": "^1.17.4",
 		"pm2": "^2.10.3"
 	},
-	"devDependencies": {},
+	"devDependencies": {
+		"nodemon": "^1.17.4"
+	},
 	"scripts": {
 		"dev": "nodemon",
-		"start": "nodemon",
-		"start2": "pm2 start src/server.js --name bolao"
+		"start": "pm2 start src/server.js --name bolao"
 	}
 }

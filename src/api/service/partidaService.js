@@ -91,7 +91,7 @@ const atualizarPontuacao = (req, res, next, partida) => {
 				palpites[i] = palpite
 			}
 		}
-		users = 	.sort((u1, u2) => u1.totalAcumulado < u2.totalAcumulado)
+		users = users.sort((u1, u2) => u1.totalAcumulado < u2.totalAcumulado)
 		for (let i = 0; i < users.length; i++) {
 			users[i].classificacao = i + 1
 			console.log(users[i])
