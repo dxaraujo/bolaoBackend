@@ -72,6 +72,7 @@ const atualizarPontuacao = partida => {
 			}
 			resolve(users)
 		})
+		console.log(users)
 		users.forEach(user => {
 			let palpite = yield Palpite.findOne({ user: user._id, partida: partida._id }, (err, palpite) => {
 				if (err) {
