@@ -67,6 +67,8 @@ const atualizarPontuacao = partida => {
 	User.find({}, (err, users) => {
 		users.forEach(user => {
 			Palpite.findOne({ user: user._id, partida: partida._id }, (err, palpite) => {
+				console.log(err)
+				console.log(palpite)
 				if (palpite != null) {
 					const palpiteTimeVencedor = palpite.placarTimeA > palpite.placarTimeB ? 'A' : palpite.placarTimeB > palpite.placarTimeA ? 'B' : 'E'
 					const partidaTimeVencedor = partida.placarTimeA > partida.placarTimeB ? 'A' : partida.placarTimeB > partida.placarTimeA ? 'B' : 'E'
