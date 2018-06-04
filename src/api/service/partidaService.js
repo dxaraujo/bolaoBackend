@@ -66,7 +66,7 @@ router.use(handlerError)
 const atualizarPontuacao = partida => {
 	User.find({}, (err, users) => {
 		users.forEach(user => {
-			Palpite.findOne({ user: user._id, partida: partida_id }, (err, palpite) => {
+			Palpite.findOne({ user: user._id, partida: partida._id }, (err, palpite) => {
 				const palpiteTimeVencedor = palpite.placarTimeA > palpite.placarTimeB ? 'A' : palpite.placarTimeB > palpite.placarTimeA ? 'B' : 'E'
 				const partidaTimeVencedor = partida.placarTimeA > partida.placarTimeB ? 'A' : partida.placarTimeB > partida.placarTimeA ? 'B' : 'E'
 				if (palpite.placarTimeA === partida.placarTimeA && palpite.placarTimeB === partida.placarTimeB) {
