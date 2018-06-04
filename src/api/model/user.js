@@ -1,6 +1,4 @@
 const mongoose = require('mongoose')
-const Palpite = require('./palpite')
-const Pontuacao = require('./pontuacao')
 
 const userSchema = new mongoose.Schema({
 	name: {
@@ -21,20 +19,19 @@ const userSchema = new mongoose.Schema({
 		type: String,
 		required: false
 	},
-	pontuacao: {
-		type: Pontuacao.schema,
-		required: true,
-		default: {
-			total: 0,
-			placarCheio: 0,
-			placarTimeVencedorComGol: 0,
-			placarTimeVencedor: 0,
-			placarGol: 0
-		}
-	},
 	facebookId: {
 		type: String,
 		required: false
+	},
+	classificacao: {
+		type: Number,
+		required: true,
+		default: 0
+	},
+	totalAcumulado: {
+		type: Number,
+		required: true,
+		default: 0
 	},
 	isAdmin: {
 		type: Boolean,
