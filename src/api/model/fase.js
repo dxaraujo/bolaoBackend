@@ -1,14 +1,16 @@
 const mongoose = require('mongoose')
 
+// 1.DESABILITADO, 2.ABERTO PARA PREENCHIMENTO DE PALPITES 3.BLOQUEADO PARA ALTERAÇÃO
 const faseSchema = new mongoose.Schema({
 	nome: {
 		type: String,
 		required: true
 	},
 	status: {
-		type: Boolean,
+		type: String,
 		required: true,
-		default: false
+		enum: ['D', 'A', 'B'],
+		default: 'D'
 	}
 })
 

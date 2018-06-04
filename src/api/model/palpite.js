@@ -48,11 +48,6 @@ const palpiteSchema = new mongoose.Schema({
 	placarGol: {
 		type: Boolean,
 		required: true
-	},
-	liberado: {
-		type: Boolean,
-		required: true,
-		default: true
 	}
 })
 
