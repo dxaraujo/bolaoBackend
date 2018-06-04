@@ -65,7 +65,7 @@ router.use(handlerError)
 
 const atualizarPontuacao = partida => {
 	User.find({}, (err, users) => {
-		const palpiteUsers = [];
+		let palpiteUsers = [];
 		users.forEach(user => {
 			Palpite.findOne({ user: user._id, partida: partida._id }, (err, palpite) => {
 				if (palpite != null) {
