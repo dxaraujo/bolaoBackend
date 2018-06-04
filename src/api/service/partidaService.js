@@ -97,7 +97,7 @@ const atualizarPontuacao = partida => {
 			let user = users[i]
 			user.classificacao = i + 1
 			if (palpiteUsers[user._id]) {
-				const palpite = palpiteUsers[user._id]
+				let palpite = palpiteUsers[user._id]
 				palpite.classificacao = user.classificacao
 				user.totalAcumulado = palpite.totalAcumulado
 
