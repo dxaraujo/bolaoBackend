@@ -40,7 +40,7 @@ router.delete('/:id', (req, res, next) => {
 router.put('/:user/updatePalpites', (req, res, next) => {
 	const palpites = montarPalpiteUpdate(req.body)
 	palpites.forEach(palpite => {
-		Palpite.findByIdAndUpdate({ _id: palpite._id}, palpite, { new: true }, (err, palp) => {
+		Palpite.findByIdAndUpdate({ _id: palpite._id }, palpite, { new: true }, (err, palp) => {
 			console.log('chamou')
 		})
 	})
@@ -50,22 +50,22 @@ router.put('/:user/updatePalpites', (req, res, next) => {
 router.get('/:user/:fase/montarpalpites', (req, res, next) => {
 	const user = req.params.user
 	const fase = req.params.fase
-	Palpite.find({user}, (err, data) => {
+	Palpite.find({ user }, (err, data) => {
 		if (!err) {
 			Partida.find({ fase }, (err, partidas) => {
 				const parts = ordernarPartidas(partidas)
 				Time.find({}, (err, times) => {
 					let palpites = []
 					parts.forEach(partida => {
-						palpites.push({user, partida: partida._id})
+						palpites.push({ user, partida: partida._id })
 					})
 					if (data && data.length > 0) {
 						const grupos = montarPalpites(data, parts, times)
-						respondOrErr(res, next, 500, err, 200, { data: grupos })		
+						respondOrErr(res, next, 500, err, 200, { data: grupos })
 					} else {
 						Palpite.insertMany(palpites, (err, palpites) => {
 							const grupos = montarPalpites(palpites, parts, times)
-							respondOrErr(res, next, 500, err, 200, { data: grupos })		
+							respondOrErr(res, next, 500, err, 200, { data: grupos })
 						})
 					}
 				})
@@ -79,8 +79,7 @@ router.get('/:user/:fase/montarpalpites', (req, res, next) => {
 const montarPalpiteUpdate = (palpites) => {
 	const palp = []
 	palpites.forEach(palpite => {
-		const resultadoPartida = palpite.placarTimeA > palpite.placarTimeB ? 'A' : palpite.placarTimeB > palpite.placarTimeA ? 'B' : 'E'
-		palp.push({_id: palpite._id, placarTimeA: palpite.placarTimeA, placarTimeB: palpite.placarTimeB, resultadoPartida})
+		palp.push({ _id: palpite._id, placarTimeA: palpite.placarTimeA, placarTimeB: palpite.placarTimeB })
 	})
 	return palp
 }
@@ -120,8 +119,8 @@ const popularTimes = (partidas, times) => {
 	partidas.forEach(partida => {
 		const timeA = times.find(time => time._id.equals(partida.timeA))
 		const timeB = times.find(time => time._id.equals(partida.timeB))
-		part.push({...partida._doc, timeA, timeB})
-		
+		part.push({ ...partida._doc, timeA, timeB })
+
 	})
 	return part
 }
@@ -131,8 +130,8 @@ const popularPartidas = (palpites, partidas, times) => {
 	const palp = []
 	palpites.forEach(palpite => {
 		const partida = partidas.find(partida => partida._id.equals(palpite.partida))
-		palp.push({...palpite._doc, partida})
-		
+		palp.push({ ...palpite._doc, partida })
+
 	})
 	return palp
 }
@@ -142,34 +141,34 @@ const montarPalpites = (palpites, partidas, times) => {
 	palpites = ordernarPalpites(palpites)
 	let idx = 0
 	let gidx = 0
-	let grupo = { nome : palpites[0].partida.grupo, rodadas: [] }
+	let grupo = { nome: palpites[0].partida.grupo, rodadas: [] }
 	let grupos = [grupo]
 	let ridx = 0
-	let rodada = { nome : palpites[0].partida.rodada, palpites: [] }
+	let rodada = { nome: palpites[0].partida.rodada, palpites: [] }
 	let rodadas = [rodada]
-	while(idx < palpites.length) {
+	while (idx < palpites.length) {
 		let partida = palpites[idx].partida
 		if (partida.grupo === grupos[gidx].nome) {
-			if(partida.rodada === rodadas[ridx].nome) {
-				rodadas[ridx].palpites.push({...palpites[idx++]})
+			if (partida.rodada === rodadas[ridx].nome) {
+				rodadas[ridx].palpites.push({ ...palpites[idx++] })
 			} else {
 				// NOVA RODADA PARA O MESMO GRUPO
 				++ridx
-				rodada = { nome : palpites[idx].partida.rodada, palpites: [] }
+				rodada = { nome: palpites[idx].partida.rodada, palpites: [] }
 				rodadas.push(rodada)
-				rodadas[ridx].palpites.push({...palpites[idx++]})
+				rodadas[ridx].palpites.push({ ...palpites[idx++] })
 			}
 		} else {
 			//NOVO GRUPO
 			grupos[gidx].rodadas = rodadas
 			++gidx
-			grupo = { nome : palpites[idx].partida.grupo, rodadas: [] }
+			grupo = { nome: palpites[idx].partida.grupo, rodadas: [] }
 			grupos.push(grupo)
-			
-			
+
+
 			// NOVA RODADA
 			ridx = 0
-			rodada = { nome : palpites[idx].partida.rodada, palpites: [] }
+			rodada = { nome: palpites[idx].partida.rodada, palpites: [] }
 			rodadas = [rodada]
 		}
 	}
