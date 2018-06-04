@@ -20,6 +20,6 @@
 	},
 	"scripts": {
 		"dev": "nodemon",
-		"start": "pm2 start src/server.js --name bolao"
+		"start": "node ./node_modules/.bin/pm2 start --attach src/server.js --name bolao"
 	}
 }
