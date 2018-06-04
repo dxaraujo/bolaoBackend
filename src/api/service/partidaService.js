@@ -86,6 +86,7 @@ const atualizarPontuacao = partida => {
 						palpite.totalPontosObitidos = 1
 						palpite.placarGol = true
 					}
+					console.log('Achou o palpite')
 					palpite.totalAcumulado = user.totalAcumulado + palpite.totalPontosObitidos
 					palpiteUsers[user._id] = palpite
 				}
