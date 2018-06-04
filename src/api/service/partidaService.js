@@ -67,26 +67,28 @@ const atualizarPontuacao = partida => {
 	User.find({}, (err, users) => {
 		users.forEach(user => {
 			Palpite.findOne({ user: user._id, partida: partida._id }, (err, palpite) => {
-				const palpiteTimeVencedor = palpite.placarTimeA > palpite.placarTimeB ? 'A' : palpite.placarTimeB > palpite.placarTimeA ? 'B' : 'E'
-				const partidaTimeVencedor = partida.placarTimeA > partida.placarTimeB ? 'A' : partida.placarTimeB > partida.placarTimeA ? 'B' : 'E'
-				if (palpite.placarTimeA === partida.placarTimeA && palpite.placarTimeB === partida.placarTimeB) {
-					palpite.totalPontosObitidos = 5
-					palpite.placarCheio = true
-				} else if (palpiteTimeVencedor === partidaTimeVencedor) {
-					if (palpite.placarTimeA === partida.placarTimeA || palpite.placarTimeB === partida.placarTimeB) {
-						palpite.totalPontosObitidos = 3
-						palpite.placarTimeVencedorComGol = true
-					} else {
-						palpite.totalPontosObitidos = 2
-						palpite.placarTimeVencedor = true
+				if (palpite != null) {
+					const palpiteTimeVencedor = palpite.placarTimeA > palpite.placarTimeB ? 'A' : palpite.placarTimeB > palpite.placarTimeA ? 'B' : 'E'
+					const partidaTimeVencedor = partida.placarTimeA > partida.placarTimeB ? 'A' : partida.placarTimeB > partida.placarTimeA ? 'B' : 'E'
+					if (palpite.placarTimeA === partida.placarTimeA && palpite.placarTimeB === partida.placarTimeB) {
+						palpite.totalPontosObitidos = 5
+						palpite.placarCheio = true
+					} else if (palpiteTimeVencedor === partidaTimeVencedor) {
+						if (palpite.placarTimeA === partida.placarTimeA || palpite.placarTimeB === partida.placarTimeB) {
+							palpite.totalPontosObitidos = 3
+							palpite.placarTimeVencedorComGol = true
+						} else {
+							palpite.totalPontosObitidos = 2
+							palpite.placarTimeVencedor = true
+						}
+					} else if (palpite.placarTimeA === partida.placarTimeA || palpite.placarTimeB === partida.placarTimeB) {
+						palpite.totalPontosObitidos = 1
+						palpite.placarGol = true
 					}
-				} else if (palpite.placarTimeA === partida.placarTimeA || palpite.placarTimeB === partida.placarTimeB) {
-					palpite.totalPontosObitidos = 1
-					palpite.placarGol = true
+					user.totalAcumulado = user.totalAcumulado + palpite.totalPontosObitidos
+					Palpite.findByIdAndUpdate(palpite._id, palpite, (err, data) => {
+					})
 				}
-				user.totalAcumulado = user.totalAcumulado + palpite.totalPontosObitidos
-				Palpite.findByIdAndUpdate(palpite._id, palpite, (err, data) => {
-				})
 			})
 		})
 		users = users.sort((u1, u2) => u1.totalAcumulado > u2.totalAcumulado)
