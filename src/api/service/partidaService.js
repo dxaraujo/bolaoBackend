@@ -4,7 +4,7 @@ const moment = require('moment')
 const Partida = require('../model/partida')
 const Palpite = require('../model/palpite')
 const User = require('../model/user')
-const { respondOrErr, handlerError } = require('../../util/serviceUtils')
+const { respondOrErr, respondSuccess, respondErr, handlerError } = require('../../util/serviceUtils')
 
 const router = express.Router()
 
@@ -43,10 +43,7 @@ router.post('/', (req, res, next) => {
 
 router.put('/:id/updateResultado', (req, res, next) => {
 	Partida.findByIdAndUpdate(req.params.id, req.body, { new: true }, (err, data) => {
-		if (data) {
-			atualizarPontuacao(data);
-		}
-		respondOrErr(res, next, 500, err, 200, { data })
+		atualizarPontuacao(req, res, next, data);
 	})
 })
 
@@ -64,22 +61,13 @@ router.delete('/:id', (req, res, next) => {
 
 router.use(handlerError)
 
-const atualizarPontuacao = partida => {
+const atualizarPontuacao = (req, res, next, partida) => {
 	co(function* () {
-		let users = yield User.find({}, (err, users) => {
-			if (err) {
-				reject(err)
-			}
-			resolve(users)
-		})
-		console.log(users)
-		users.forEach(user => {
-			let palpite = yield Palpite.findOne({ user: user._id, partida: partida._id }, (err, palpite) => {
-				if (err) {
-					reject(err)
-				}
-				resolve(palpite)
-			})
+		let palpites = []
+		let users = yield User.find({})
+		for (let i = 0; i < users.length; i++) {
+			let user = users[i]
+			let palpite = yield Palpite.findOne({ user: user._id, partida: partida._id })
 			if (palpite != null) {
 				const palpiteTimeVencedor = palpite.placarTimeA > palpite.placarTimeB ? 'A' : palpite.placarTimeB > palpite.placarTimeA ? 'B' : 'E'
 				const partidaTimeVencedor = partida.placarTimeA > partida.placarTimeB ? 'A' : partida.placarTimeB > partida.placarTimeA ? 'B' : 'E'
@@ -100,30 +88,23 @@ const atualizarPontuacao = partida => {
 				}
 				palpite.totalAcumulado = user.totalAcumulado + palpite.totalPontosObitidos
 				user.totalAcumulado = palpite.totalAcumulado
-				user.palpite = palpite
+				palpites[i] = palpite
 			}
-		})
-		console.log('Chegou Aqui')
-		users = users.sort((u1, u2) => u1.totalAcumulado > u2.totalAcumulado)
-		for (let i = 0; i < users.length; i++) {
-			let user = users[i]
-			user.classificacao = i + 1
-			if (user.palpite) {
-				let palpite = user.palpite
-				palpite.classificacao = user.classificacao
-
-				console.log(palpite)
-				yield Palpite.findByIdAndUpdate(palpite._id, palpite, (err, data) => {
-					console.log(err)
-					console.log(data)
-				})
-			}
-			yield User.findByIdAndUpdate(user._id, user, (err, data) => {
-				console.log(err)
-				console.log(data)
-			})
 		}
-	}).catch(onerror);
+		users = 	.sort((u1, u2) => u1.totalAcumulado < u2.totalAcumulado)
+		for (let i = 0; i < users.length; i++) {
+			users[i].classificacao = i + 1
+			console.log(users[i])
+			if (palpites[i]) {
+				palpites[i].classificacao = users[i].classificacao
+				yield Palpite.findByIdAndUpdate(palpites[i]._id, palpites[i])
+			}
+			yield User.findByIdAndUpdate(users[i]._id, users[i])
+		}
+		respondSuccess(res, 200, { data: partida })
+	}).catch(err => {
+		respondErr(next, 500, err)
+	});
 }
 
 exports = module.exports = router

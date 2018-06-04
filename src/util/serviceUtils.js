@@ -2,14 +2,17 @@ const express = require('express')
 
 const respondOrErr = (res, next, errStatusCode, err, statusCode, data) => {
 	if (err) {
-		err.statusCode = errStatusCode
-		next(err)
+		respondErr(next, errStatusCode, err)
 	} else {
-		res.status(statusCode).json(data);
+		respondSuccess(res, statusCode, data)
 	}
 };
 
-const respondErr = (res, next, errStatusCode, err) => {
+const respondSuccess = (res, statusCode, data) => {
+	res.status(statusCode).json(data);
+};
+
+const respondErr = (next, errStatusCode, err) => {
 	err.statusCode = errStatusCode
 	next(err)
 };
@@ -63,4 +66,4 @@ const createService = (model) => {
 	return router
 }
 
-module.exports = { createService, respondOrErr, respondErr, handlerError }
+module.exports = { createService, respondOrErr, respondErr, respondSuccess, handlerError }
