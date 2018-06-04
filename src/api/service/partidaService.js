@@ -21,7 +21,7 @@ router.get('/resultado', (req, res, next) => {
 				}
 			})
 		}
-		respondOrErr(res, next, 500, err, 200, { partidas })
+		respondOrErr(res, next, 500, err, 200, { data: partidas })
 	})
 })
 
