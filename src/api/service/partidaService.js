@@ -85,7 +85,7 @@ const atualizarPontuacao = partida => {
 						palpite.totalPontosObitidos = 1
 						palpite.placarGol = true
 					}
-					user.totalAcumulado = (user.totalAcumulado || 0) + palpite.totalPontosObitidos
+					user.totalAcumulado = new Number((user.totalAcumulado || 0) + palpite.totalPontosObitidos)
 					user.palpite = palpite
 				}
 			})
