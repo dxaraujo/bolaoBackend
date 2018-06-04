@@ -35,19 +35,23 @@ const palpiteSchema = new mongoose.Schema({
 	},
 	placarCheio: {
 		type: Boolean,
-		required: true
+		required: true,
+		default: false
 	},
 	placarTimeVencedorComGol: {
 		type: Boolean,
-		required: true
+		required: true,
+		default: false
 	},
 	placarTimeVencedor: {
 		type: Boolean,
-		required: true
+		required: true,
+		default: false
 	},
 	placarGol: {
 		type: Boolean,
-		required: true
+		required: true,
+		default: false
 	}
 })
 
