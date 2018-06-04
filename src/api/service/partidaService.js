@@ -43,7 +43,6 @@ router.post('/', (req, res, next) => {
 router.put('/:id/updateResultado', (req, res, next) => {
 	Partida.findByIdAndUpdate(req.params.id, req.body, { new: true }, (err, data) => {
 		if (data) {
-			console.log(data)
 			atualizarPontuacao(data);
 		}
 		respondOrErr(res, next, 500, err, 200, { data })
@@ -67,11 +66,7 @@ router.use(handlerError)
 const atualizarPontuacao = partida => {
 	User.find({}, (err, users) => {
 		users.forEach(user => {
-			console.log(user._id)
-			console.log(partida._id)
 			Palpite.findOne({ user: user._id, partida: partida._id }, (err, palpite) => {
-				console.log(err)
-				console.log(palpite)
 				if (palpite != null) {
 					const palpiteTimeVencedor = palpite.placarTimeA > palpite.placarTimeB ? 'A' : palpite.placarTimeB > palpite.placarTimeA ? 'B' : 'E'
 					const partidaTimeVencedor = partida.placarTimeA > partida.placarTimeB ? 'A' : partida.placarTimeB > partida.placarTimeA ? 'B' : 'E'
@@ -90,7 +85,7 @@ const atualizarPontuacao = partida => {
 						palpite.totalPontosObitidos = 1
 						palpite.placarGol = true
 					}
-					user.totalAcumulado = user.totalAcumulado + palpite.totalPontosObitidos
+					user.totalAcumulado = (user.totalAcumulado || 0) + palpite.totalPontosObitidos
 					user.palpite = palpite
 				}
 			})
@@ -99,11 +94,15 @@ const atualizarPontuacao = partida => {
 		for (let i = 0; i < users.length; i++) {
 			users[i].classificacao = i + 1
 			User.findByIdAndUpdate(users[i]._id, users[i], (err, data) => {
+				console.log(err)
+				console.log(data)
 			})
 			if (users[i].palpite) {
 				users[i].palpite.classificacao = users[i].classificacao
 				users[i].palpite.totalAcumulado = users[i].totalAcumulado
 				Palpite.findByIdAndUpdate(user[i].palpite._id, user[i].palpite, (err, data) => {
+					console.log(err)
+					console.log(data)
 				})
 			}
 		}
