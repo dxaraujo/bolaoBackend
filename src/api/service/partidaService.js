@@ -90,7 +90,7 @@ const atualizarPontuacao = partida => {
 					console.log(new Number(user.totalAcumulado + palpite.totalPontosObitidos))
 					user.totalAcumulado = new Number(user.totalAcumulado + palpite.totalPontosObitidos)
 					console.log(user.totalAcumulado)
-					palpiteUser[user._id] = palpite
+					palpiteUsers[user._id] = palpite
 				}
 			})
 		})
@@ -101,8 +101,8 @@ const atualizarPontuacao = partida => {
 			console.log(users[i].palpite)
 			User.findByIdAndUpdate(users[i]._id, users[i], (err, data) => {
 			})
-			if (palpiteUser[users[i]._id]) {
-				const palpite = palpiteUser[users[i]._id]
+			if (palpiteUsers[users[i]._id]) {
+				const palpite = palpiteUsers[users[i]._id]
 				palpite.classificacao = users[i].classificacao
 				palpite.totalAcumulado = users[i].totalAcumulado
 				console.log(palpite)
