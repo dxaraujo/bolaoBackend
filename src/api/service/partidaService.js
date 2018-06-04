@@ -92,7 +92,7 @@ const atualizarPontuacao = partida => {
 					palpiteUsers[user._id] = palpite
 					console.log(user)
 					console.log(palpite)
-					console.log(alpiteUsers)
+					console.log(palpiteUsers)
 				}
 			})
 		})
