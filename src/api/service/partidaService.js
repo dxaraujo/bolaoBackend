@@ -13,15 +13,16 @@ router.get('/', (req, res, next) => {
 
 router.get('/resultado', (req, res, next) => {
 	Partida.find({}, req.body, (err, data) => {
-		let partidas = []
-		if (data) {
-			data.forEach(partida => {
-				if (moment(partida.data, 'YYYY-MM-DDThh:mm:ss').isBefore(new Date())) {
-					partidas.push(partida)
+		/* 		let partidas = []
+				if (data) {
+					data.forEach(partida => {
+						if (moment(partida.data, 'YYYY-MM-DDThh:mm:ss').isBefore(new Date())) {
+							partidas.push(partida)
+						}
+					})
 				}
-			})
-		}
-		respondOrErr(res, next, 500, err, 200, { data: partidas })
+				respondOrErr(res, next, 500, err, 200, { data: partidas }) */
+		respondOrErr(res, next, 500, err, 200, { data })
 	})
 })
 
