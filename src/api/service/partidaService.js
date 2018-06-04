@@ -73,52 +73,51 @@ const atualizarPontuacao = partida => {
 			resolve(users)
 		})
 		users.forEach(user => {
-			palpite = yield Palpite.findOne({ user: user._id, partida: partida._id }, (err, palpite) => {
-				if (palpite != null) {
-					const palpiteTimeVencedor = palpite.placarTimeA > palpite.placarTimeB ? 'A' : palpite.placarTimeB > palpite.placarTimeA ? 'B' : 'E'
-					const partidaTimeVencedor = partida.placarTimeA > partida.placarTimeB ? 'A' : partida.placarTimeB > partida.placarTimeA ? 'B' : 'E'
-					if (palpite.placarTimeA === partida.placarTimeA && palpite.placarTimeB === partida.placarTimeB) {
-						palpite.totalPontosObitidos = 5
-						palpite.placarCheio = true
-					} else if (palpiteTimeVencedor === partidaTimeVencedor) {
-						if (palpite.placarTimeA === partida.placarTimeA || palpite.placarTimeB === partida.placarTimeB) {
-							palpite.totalPontosObitidos = 3
-							palpite.placarTimeVencedorComGol = true
-						} else {
-							palpite.totalPontosObitidos = 2
-							palpite.placarTimeVencedor = true
-						}
-					} else if (palpite.placarTimeA === partida.placarTimeA || palpite.placarTimeB === partida.placarTimeB) {
-						palpite.totalPontosObitidos = 1
-						palpite.placarGol = true
-					}
-					palpite.totalAcumulado = user.totalAcumulado + palpite.totalPontosObitidos
-					resolve(palpite)
-				} else {
-					resolve({})
+			let palpite = yield Palpite.findOne({ user: user._id, partida: partida._id }, (err, palpite) => {
+				if (err) {
+					reject(err)
 				}
+				resolve(palpite)
 			})
-			user.totalAcumulado = user.totalAcumulado + palpite.totalPontosObitidos || 0
-			user.palpite = palpite
+			if (palpite != null) {
+				const palpiteTimeVencedor = palpite.placarTimeA > palpite.placarTimeB ? 'A' : palpite.placarTimeB > palpite.placarTimeA ? 'B' : 'E'
+				const partidaTimeVencedor = partida.placarTimeA > partida.placarTimeB ? 'A' : partida.placarTimeB > partida.placarTimeA ? 'B' : 'E'
+				if (palpite.placarTimeA === partida.placarTimeA && palpite.placarTimeB === partida.placarTimeB) {
+					palpite.totalPontosObitidos = 5
+					palpite.placarCheio = true
+				} else if (palpiteTimeVencedor === partidaTimeVencedor) {
+					if (palpite.placarTimeA === partida.placarTimeA || palpite.placarTimeB === partida.placarTimeB) {
+						palpite.totalPontosObitidos = 3
+						palpite.placarTimeVencedorComGol = true
+					} else {
+						palpite.totalPontosObitidos = 2
+						palpite.placarTimeVencedor = true
+					}
+				} else if (palpite.placarTimeA === partida.placarTimeA || palpite.placarTimeB === partida.placarTimeB) {
+					palpite.totalPontosObitidos = 1
+					palpite.placarGol = true
+				}
+				palpite.totalAcumulado = user.totalAcumulado + palpite.totalPontosObitidos
+				user.totalAcumulado = palpite.totalAcumulado
+				user.palpite = palpite
+			}
 		})
 		console.log('Chegou Aqui')
-		console.log(palpiteUsers)
 		users = users.sort((u1, u2) => u1.totalAcumulado > u2.totalAcumulado)
 		for (let i = 0; i < users.length; i++) {
 			let user = users[i]
 			user.classificacao = i + 1
-			if (palpiteUsers[user._id]) {
-				let palpite = palpiteUsers[user._id]
+			if (user.palpite) {
+				let palpite = user.palpite
 				palpite.classificacao = user.classificacao
-				user.totalAcumulado = palpite.totalAcumulado
 
 				console.log(palpite)
-				Palpite.findByIdAndUpdate(palpite._id, palpite, (err, data) => {
+				yield Palpite.findByIdAndUpdate(palpite._id, palpite, (err, data) => {
 					console.log(err)
 					console.log(data)
 				})
 			}
-			User.findByIdAndUpdate(user._id, user, (err, data) => {
+			yield User.findByIdAndUpdate(user._id, user, (err, data) => {
 				console.log(err)
 				console.log(data)
 			})
