@@ -1,4 +1,5 @@
 const express = require('express')
+const co = require('co')
 const moment = require('moment')
 const Partida = require('../model/partida')
 const Palpite = require('../model/palpite')
@@ -63,11 +64,16 @@ router.delete('/:id', (req, res, next) => {
 
 router.use(handlerError)
 
-const atualizarPontuacao = async partida => {
-	User.find({}, (err, users) => {
-		let palpiteUsers = [];
+const atualizarPontuacao = partida => {
+	co(function* () {
+		let users = yield User.find({}, (err, users) => {
+			if (err) {
+				reject(err)
+			}
+			resolve(users)
+		})
 		users.forEach(user => {
-			await Palpite.findOne({ user: user._id, partida: partida._id }, (err, palpite) => {
+			yield Palpite.findOne({ user: user._id, partida: partida._id }, (err, palpite) => {
 				if (palpite != null) {
 					const palpiteTimeVencedor = palpite.placarTimeA > palpite.placarTimeB ? 'A' : palpite.placarTimeB > palpite.placarTimeA ? 'B' : 'E'
 					const partidaTimeVencedor = partida.placarTimeA > partida.placarTimeB ? 'A' : partida.placarTimeB > partida.placarTimeA ? 'B' : 'E'
@@ -110,12 +116,11 @@ const atualizarPontuacao = async partida => {
 				})
 			}
 			User.findByIdAndUpdate(user._id, user, (err, data) => {
+				console.log(err)
+				console.log(data)
 			})
 		}
-	})
-}
-
-const finalizarCalculoPontuacoes = users => {
+	}).catch(onerror);
 }
 
 exports = module.exports = router

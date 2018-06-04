@@ -4,8 +4,10 @@
 	"main": "src/server.js",
 	"license": "MIT",
 	"dependencies": {
+		"async": "^2.6.1",
 		"bcryptjs": "^2.4.3",
 		"body-parser": "^1.18.2",
+		"co": "^4.6.0",
 		"cors": "^2.8.4",
 		"express": "^4.16.3",
 		"express-query-int": "^3.0.0",
