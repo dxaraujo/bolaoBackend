@@ -63,11 +63,11 @@ router.delete('/:id', (req, res, next) => {
 
 router.use(handlerError)
 
-const atualizarPontuacao = partida => {
+const atualizarPontuacao = async partida => {
 	User.find({}, (err, users) => {
 		let palpiteUsers = [];
 		users.forEach(user => {
-			Palpite.findOne({ user: user._id, partida: partida._id }, (err, palpite) => {
+			await Palpite.findOne({ user: user._id, partida: partida._id }, (err, palpite) => {
 				if (palpite != null) {
 					const palpiteTimeVencedor = palpite.placarTimeA > palpite.placarTimeB ? 'A' : palpite.placarTimeB > palpite.placarTimeA ? 'B' : 'E'
 					const partidaTimeVencedor = partida.placarTimeA > partida.placarTimeB ? 'A' : partida.placarTimeB > partida.placarTimeA ? 'B' : 'E'
@@ -86,13 +86,9 @@ const atualizarPontuacao = partida => {
 						palpite.totalPontosObitidos = 1
 						palpite.placarGol = true
 					}
-					console.log('Achou o palpite')
 					palpite.totalAcumulado = user.totalAcumulado + palpite.totalPontosObitidos
 					user.totalAcumulado = user.totalAcumulado + palpite.totalPontosObitidos
-					palpiteUsers[user._id] = palpite
-					console.log(user)
-					console.log(palpite)
-					console.log(palpiteUsers)
+					user.palpite = palpite
 				}
 			})
 		})
@@ -117,6 +113,9 @@ const atualizarPontuacao = partida => {
 			})
 		}
 	})
+}
+
+const finalizarCalculoPontuacoes = users => {
 }
 
 exports = module.exports = router
