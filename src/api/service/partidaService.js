@@ -73,7 +73,7 @@ const atualizarPontuacao = partida => {
 			resolve(users)
 		})
 		users.forEach(user => {
-			yield Palpite.findOne({ user: user._id, partida: partida._id }, (err, palpite) => {
+			palpite = yield Palpite.findOne({ user: user._id, partida: partida._id }, (err, palpite) => {
 				if (palpite != null) {
 					const palpiteTimeVencedor = palpite.placarTimeA > palpite.placarTimeB ? 'A' : palpite.placarTimeB > palpite.placarTimeA ? 'B' : 'E'
 					const partidaTimeVencedor = partida.placarTimeA > partida.placarTimeB ? 'A' : partida.placarTimeB > partida.placarTimeA ? 'B' : 'E'
@@ -93,10 +93,13 @@ const atualizarPontuacao = partida => {
 						palpite.placarGol = true
 					}
 					palpite.totalAcumulado = user.totalAcumulado + palpite.totalPontosObitidos
-					user.totalAcumulado = user.totalAcumulado + palpite.totalPontosObitidos
-					user.palpite = palpite
+					resolve(palpite)
+				} else {
+					resolve({})
 				}
 			})
+			user.totalAcumulado = user.totalAcumulado + palpite.totalPontosObitidos || 0
+			user.palpite = palpite
 		})
 		console.log('Chegou Aqui')
 		console.log(palpiteUsers)
