@@ -86,10 +86,7 @@ const atualizarPontuacao = partida => {
 						palpite.totalPontosObitidos = 1
 						palpite.placarGol = true
 					}
-					console.log(user.totalAcumulado)
-					console.log(new Number(user.totalAcumulado + palpite.totalPontosObitidos))
-					user.totalAcumulado = new Number(user.totalAcumulado + palpite.totalPontosObitidos)
-					console.log(user.totalAcumulado)
+					palpite.totalAcumulado = user.totalAcumulado + palpite.totalPontosObitidos
 					palpiteUsers[user._id] = palpite
 				}
 			})
@@ -97,20 +94,19 @@ const atualizarPontuacao = partida => {
 		users = users.sort((u1, u2) => u1.totalAcumulado > u2.totalAcumulado)
 		for (let i = 0; i < users.length; i++) {
 			users[i].classificacao = i + 1
-			console.log(users[i])
-			console.log(users[i].palpite)
-			User.findByIdAndUpdate(users[i]._id, users[i], (err, data) => {
-			})
 			if (palpiteUsers[users[i]._id]) {
 				const palpite = palpiteUsers[users[i]._id]
 				palpite.classificacao = users[i].classificacao
-				palpite.totalAcumulado = users[i].totalAcumulado
+				users[i].totalAcumulado = palpite.totalAcumulado
+
 				console.log(palpite)
 				Palpite.findByIdAndUpdate(user[i].palpite._id, user[i].palpite, (err, data) => {
 					console.log(err)
 					console.log(data)
 				})
 			}
+			User.findByIdAndUpdate(users[i]._id, users[i], (err, data) => {
+			})
 		}
 	})
 }
