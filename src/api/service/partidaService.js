@@ -98,6 +98,7 @@ const atualizarPontuacao = partida => {
 			User.findByIdAndUpdate(users[i]._id, users[i], (err, data) => {
 				if (user[i].palpite) {
 					user[i].palpite.classificacao = users[i].classificacao
+					user[i].palpite.totalAcumulado = users[i].totalAcumulado
 					Palpite.findByIdAndUpdate(user[i].palpite._id, user[i].palpite, (err, data) => {
 					})
 				}
