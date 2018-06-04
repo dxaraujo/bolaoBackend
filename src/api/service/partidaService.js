@@ -88,8 +88,7 @@ const atualizarPontuacao = partida => {
 						palpite.placarGol = true
 					}
 					user.totalAcumulado = user.totalAcumulado + palpite.totalPontosObitidos
-					Palpite.findByIdAndUpdate(palpite._id, palpite, (err, data) => {
-					})
+					user.palpite = palpite
 				}
 			})
 		})
@@ -97,6 +96,10 @@ const atualizarPontuacao = partida => {
 		for (let i = 0; i < users.length; i++) {
 			users[i].classificacao = i + 1
 			User.findByIdAndUpdate(users[i]._id, users[i], (err, data) => {
+				if (user[i].palpite) {
+					Palpite.findByIdAndUpdate(user[i].palpite._id, user[i].palpite, (err, data) => {
+					})
+				}
 			})
 		}
 	})
