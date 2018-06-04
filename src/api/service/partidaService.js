@@ -65,6 +65,7 @@ router.use(handlerError)
 
 const atualizarPontuacao = partida => {
 	User.find({}, (err, users) => {
+		const palpiteUsers = [];
 		users.forEach(user => {
 			Palpite.findOne({ user: user._id, partida: partida._id }, (err, palpite) => {
 				if (palpite != null) {
@@ -85,8 +86,11 @@ const atualizarPontuacao = partida => {
 						palpite.totalPontosObitidos = 1
 						palpite.placarGol = true
 					}
+					console.log(user.totalAcumulado)
+					console.log(new Number(user.totalAcumulado + palpite.totalPontosObitidos))
 					user.totalAcumulado = new Number(user.totalAcumulado + palpite.totalPontosObitidos)
-					user.palpite = palpite
+					console.log(user.totalAcumulado)
+					palpiteUser[user._id] = palpite
 				}
 			})
 		})
@@ -97,9 +101,11 @@ const atualizarPontuacao = partida => {
 			console.log(users[i].palpite)
 			User.findByIdAndUpdate(users[i]._id, users[i], (err, data) => {
 			})
-			if (users[i].palpite) {
-				users[i].palpite.classificacao = users[i].classificacao
-				users[i].palpite.totalAcumulado = users[i].totalAcumulado
+			if (palpiteUser[users[i]._id]) {
+				const palpite = palpiteUser[users[i]._id]
+				palpite.classificacao = users[i].classificacao
+				palpite.totalAcumulado = users[i].totalAcumulado
+				console.log(palpite)
 				Palpite.findByIdAndUpdate(user[i].palpite._id, user[i].palpite, (err, data) => {
 					console.log(err)
 					console.log(data)
