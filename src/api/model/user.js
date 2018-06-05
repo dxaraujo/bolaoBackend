@@ -23,11 +23,6 @@ const userSchema = new mongoose.Schema({
 		type: String,
 		required: false
 	},
-	classificacao: {
-		type: Number,
-		required: true,
-		default: 0
-	},
 	totalAcumulado: {
 		type: Number,
 		required: true,

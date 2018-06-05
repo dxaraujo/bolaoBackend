@@ -1,13 +1,27 @@
 const express = require('express')
+const co = require('co')
 const User = require('../model/user')
-const { respondOrErr, handlerError } = require('../../util/serviceUtils')
+const Palpite = require('../model/palpite')
+const { respondOrErr, respondErr, respondSuccess, handlerError } = require('../../util/serviceUtils')
 
 const router = express.Router()
 
 router.get('/', (req, res, next) => {
-	User.find(req.query, (err, data) => {
-		respondOrErr(res, next, 500, err, 200, { data })
-	})
+	co(function* () {
+		let users = yield User.find(req.query)
+		for (let i = 0; i < users.length; i++) {
+			let user = users[i];
+			let palpites = yield Palpite.find({ user: user._id})
+			let totalAcumulado = 0
+			for (let j = 0; j < palpites.length; j++) {
+				totalAcumulado+= palpites[j].totalPontosObitidos
+			}
+			user.totalAcumulado = totalAcumulado
+		}
+		respondSuccess(res, 200, { data: users })
+	}).catch(err => {
+		respondErr(next, 500, err)
+	});
 })
 
 router.get('/:id', (req, res, next) => {

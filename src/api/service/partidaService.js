@@ -86,19 +86,10 @@ const atualizarPontuacao = (req, res, next, partida) => {
 					palpite.totalPontosObitidos = 1
 					palpite.placarGol = true
 				}
-				palpite.totalAcumulado = user.totalAcumulado + palpite.totalPontosObitidos
-				user.totalAcumulado = palpite.totalAcumulado
 				palpites[i] = palpite
-			}
-		}
-		users = users.sort((u1, u2) => u1.totalAcumulado < u2.totalAcumulado)
-		for (let i = 0; i < users.length; i++) {
-			users[i].classificacao = i + 1
-			if (palpites[i]) {
-				palpites[i].classificacao = users[i].classificacao
 				yield Palpite.findByIdAndUpdate(palpites[i]._id, palpites[i])
 			}
-			yield User.findByIdAndUpdate(users[i]._id, users[i])
+			yield User.findByIdAndUpdate(users._id, users)
 		}
 		respondSuccess(res, 200, { data: partida })
 	}).catch(err => {

@@ -17,16 +17,6 @@ const palpiteSchema = new mongoose.Schema({
 		type: Number,
 		required: false
 	},
-	classificacao: {
-		type: Number,
-		required: true,
-		default: 0
-	},
-	totalAcumulado: {
-		type: Number,
-		required: true,
-		default: 0
-	},
 	totalPontosObitidos: {
 		type: Number,
 		required: false,
