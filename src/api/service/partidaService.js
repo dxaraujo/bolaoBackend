@@ -42,8 +42,9 @@ router.post('/', (req, res, next) => {
 })
 
 router.put('/:id/updateResultado', (req, res, next) => {
-	Partida.findByIdAndUpdate(req.params.id, req.body, { new: true }, (err, data) => {
-		atualizarPontuacao(req, res, next, data);
+	Partida.findByIdAndUpdate(req.params.id, req.body, { new: true }, (err, partida) => {
+		console.log('entrou aqui')
+		atualizarPontuacao(req, res, next, partida);
 	})
 })
 
