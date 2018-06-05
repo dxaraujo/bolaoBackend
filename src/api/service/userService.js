@@ -16,6 +16,7 @@ router.get('/', (req, res, next) => {
 			for (let j = 0; j < palpites.length; j++) {
 				totalAcumulado+= palpites[j].totalPontosObitidos
 			}
+			user.palpites = palpites
 			user.totalAcumulado = totalAcumulado
 		}
 		respondSuccess(res, 200, { data: users })
