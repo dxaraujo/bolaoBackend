@@ -43,7 +43,7 @@ router.post('/', (req, res, next) => {
 
 router.put('/:id/updateResultado', (req, res, next) => {
 	Partida.findByIdAndUpdate(req.params.id, req.body, { new: true }, (err, partida) => {
-		console.log('entrou aqui')
+		console.log(partida)
 		atualizarPontuacao(req, res, next, partida);
 	})
 })
@@ -64,7 +64,6 @@ router.use(handlerError)
 
 const atualizarPontuacao = (req, res, next, partida) => {
 	co(function* () {
-		let palpites = []
 		let users = yield User.find({})
 		for (let i = 0; i < users.length; i++) {
 			let user = users[i]
@@ -87,10 +86,8 @@ const atualizarPontuacao = (req, res, next, partida) => {
 					palpite.totalPontosObitidos = 1
 					palpite.placarGol = true
 				}
-				palpites[i] = palpite
-				yield Palpite.findByIdAndUpdate(palpites[i]._id, palpites[i])
+				yield Palpite.findByIdAndUpdate(palpite._id, palpite)
 			}
-			yield User.findByIdAndUpdate(users._id, users)
 		}
 		respondSuccess(res, 200, { data: partida })
 	}).catch(err => {
