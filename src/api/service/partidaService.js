@@ -94,7 +94,6 @@ const atualizarPontuacao = (req, res, next, partida) => {
 		users = users.sort((u1, u2) => u1.totalAcumulado < u2.totalAcumulado)
 		for (let i = 0; i < users.length; i++) {
 			users[i].classificacao = i + 1
-			console.log(users[i])
 			if (palpites[i]) {
 				palpites[i].classificacao = users[i].classificacao
 				yield Palpite.findByIdAndUpdate(palpites[i]._id, palpites[i])
