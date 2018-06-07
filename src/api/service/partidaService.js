@@ -14,19 +14,9 @@ router.get('/', (req, res, next) => {
 	})
 })
 
-router.get('/resultado', (req, res, next) => {
-	Partida.find({}, req.body, (err, data) => {
-		/* 		let partidas = []
-				if (data) {
-					data.forEach(partida => {
-						if (moment(partida.data, 'YYYY-MM-DDThh:mm:ss').isBefore(new Date())) {
-							partidas.push(partida)
-						}
-					})
-				}
-				respondOrErr(res, next, 500, err, 200, { data: partidas }) */
-		respondOrErr(res, next, 500, err, 200, { data })
-	})
+router.get('/resultado', async (req, res, next) => {
+	const partidas = await Partida.find({}, req.body).sort({ data: 'asc' })
+	respondOrErr(res, next, 500, err, 200, { data: partidas })
 })
 
 router.get('/:id', (req, res, next) => {
@@ -41,10 +31,33 @@ router.post('/', (req, res, next) => {
 	})
 })
 
-router.put('/:id/updateResultado', (req, res, next) => {
-	Partida.findByIdAndUpdate(req.params.id, req.body, { new: true }, (err, partida) => {
-		atualizarPontuacao(req, res, next, partida);
+router.put('/:id/updateResultado', async (req, res, next) => {
+	const partida = await Partida.findByIdAndUpdate(req.params.id, req.body, { new: true })
+	const users = await User.find({})
+	users.forEach(user => {
+		const palpite = await Palpite.findOne({ user: user._id, partida: partida._id })
+		if (palpite != null) {
+			const palpiteTimeVencedor = palpite.placarTimeA > palpite.placarTimeB ? 'A' : palpite.placarTimeB > palpite.placarTimeA ? 'B' : 'E'
+			const partidaTimeVencedor = partida.placarTimeA > partida.placarTimeB ? 'A' : partida.placarTimeB > partida.placarTimeA ? 'B' : 'E'
+			if (palpite.placarTimeA === partida.placarTimeA && palpite.placarTimeB === partida.placarTimeB) {
+				palpite.totalPontosObitidos = 5
+				palpite.placarCheio = true
+			} else if (palpiteTimeVencedor === partidaTimeVencedor) {
+				if (palpite.placarTimeA === partida.placarTimeA || palpite.placarTimeB === partida.placarTimeB) {
+					palpite.totalPontosObitidos = 3
+					palpite.placarTimeVencedorComGol = true
+				} else {
+					palpite.totalPontosObitidos = 2
+					palpite.placarTimeVencedor = true
+				}
+			} else if (palpite.placarTimeA === partida.placarTimeA || palpite.placarTimeB === partida.placarTimeB) {
+				palpite.totalPontosObitidos = 1
+				palpite.placarGol = true
+			}
+			await Palpite.findByIdAndUpdate(palpite._id, palpite)
+		}
 	})
+	respondSuccess(res, 200, { data: partida })
 })
 
 router.put('/:id', (req, res, next) => {
@@ -60,38 +73,5 @@ router.delete('/:id', (req, res, next) => {
 })
 
 router.use(handlerError)
-
-const atualizarPontuacao = (req, res, next, partida) => {
-	co(function* () {
-		let users = yield User.find({})
-		for (let i = 0; i < users.length; i++) {
-			let user = users[i]
-			let palpite = yield Palpite.findOne({ user: user._id, partida: partida._id })
-			if (palpite != null) {
-				const palpiteTimeVencedor = palpite.placarTimeA > palpite.placarTimeB ? 'A' : palpite.placarTimeB > palpite.placarTimeA ? 'B' : 'E'
-				const partidaTimeVencedor = partida.placarTimeA > partida.placarTimeB ? 'A' : partida.placarTimeB > partida.placarTimeA ? 'B' : 'E'
-				if (palpite.placarTimeA === partida.placarTimeA && palpite.placarTimeB === partida.placarTimeB) {
-					palpite.totalPontosObitidos = 5
-					palpite.placarCheio = true
-				} else if (palpiteTimeVencedor === partidaTimeVencedor) {
-					if (palpite.placarTimeA === partida.placarTimeA || palpite.placarTimeB === partida.placarTimeB) {
-						palpite.totalPontosObitidos = 3
-						palpite.placarTimeVencedorComGol = true
-					} else {
-						palpite.totalPontosObitidos = 2
-						palpite.placarTimeVencedor = true
-					}
-				} else if (palpite.placarTimeA === partida.placarTimeA || palpite.placarTimeB === partida.placarTimeB) {
-					palpite.totalPontosObitidos = 1
-					palpite.placarGol = true
-				}
-				yield Palpite.findByIdAndUpdate(palpite._id, palpite)
-			}
-		}
-		respondSuccess(res, 200, { data: partida })
-	}).catch(err => {
-		respondErr(next, 500, err)
-	});
-}
 
 exports = module.exports = router
