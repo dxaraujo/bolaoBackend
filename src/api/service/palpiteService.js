@@ -194,6 +194,7 @@ router.get('/:user/:fase/montarpalpites2', async (req, res, next) => {
 		Partida.find({ fase }).sort({ 'data': 'asc' }),
 		Palpite.find({ user })
 	]).then(resultados => {
+		console.log(resultados)
 		let [times, partidas, palpites] = resultados;
 		if (palpites && palpites.length > 0) {
 			return palpites
