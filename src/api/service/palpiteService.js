@@ -194,13 +194,13 @@ router.get('/:user/:fase/montarpalpites2', async (req, res, next) => {
 	console.log(times.length)
 	const partidas = await Partida.find({ fase }).sort({ 'data': 'asc' })
 	console.log('partidas')
-	console.log(partidas.length)
+	console.log(partidas)
 	const palpites = await Palpite.find({ user })
 	console.log('palpites')
 	console.log(palpites.length)
 
 	if (palpites && palpites.length > 0) {
-		const grupos = montarPalpites(palpites, parts, times)
+		const grupos = montarPalpites(palpites, partidas, times)
 		respondOrErr(res, next, 500, err, 200, { data: grupos })
 	} else {
 		console.log('sem palpites')
