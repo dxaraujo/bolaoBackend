@@ -189,29 +189,24 @@ router.get('/:user/:fase/montarpalpites2', async (req, res, next) => {
 	const user = req.params.user
 	const fase = req.params.fase
 
-	const times = await Time.find({})
-	console.log('times')
-	console.log(times.length)
-	const partidas = await Partida.find({ fase }).sort({ 'data': 'asc' })
-	console.log('partidas')
-	console.log(partidas)
-	const palpites = await Palpite.find({ user })
-	console.log('palpites')
-	console.log(palpites.length)
-
-	if (palpites && palpites.length > 0) {
+	Promise.all([
+		Time.find({}),
+		Partida.find({ fase }).sort({ 'data': 'asc' }),
+		Palpite.find({ user })
+	]).then(resultados => {
+		let [times, partidas, palpites] = resultados;
+		if (palpites && palpites.length > 0) {
+			return palpites
+		} else {
+			partidas.forEach(partida => {
+				palpites.push({ user, partida: partida._id })
+			})
+			return Palpite.insertMany(palpites);
+		}
+	}).then(palpites => {
 		const grupos = montarPalpites(palpites, partidas, times)
-		respondOrErr(res, next, 500, err, 200, { data: grupos })
-	} else {
-		console.log('sem palpites')
-		partidas.forEach(partida => {
-			palpites.push({ user, partida: partida._id })
-		})
-		Palpite.insertMany(palpites).then(palpites => {
-			const grupos = montarPalpites(palpites, partidas, times)
-			respondSuccess(res, 200, { data: grupos })
-		}).catch(err => {
-			respondErr(next, 500, { errors: err })
-		})
-	}
+		respondSuccess(res, 200, { data: grupos })
+	}).catch(err => {
+		respondErr(next, 500, { errors: err })
+	});
 })
