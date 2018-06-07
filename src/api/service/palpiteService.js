@@ -205,7 +205,7 @@ router.get('/:user/:fase/montarpalpites2', async (req, res, next) => {
 			partidas.forEach(partida => { palpites.push({ user, partida: partida._id }) })
 			return Palpite.insertMany(palpites)
 		}
-	}).then(([palpites, times]) => {
+	}).then(palpites => {
 		const grupos = montarPalpites(palpites, partidas, times)
 		respondSuccess(res, 200, { data: grupos })
 	}).catch(err => {
