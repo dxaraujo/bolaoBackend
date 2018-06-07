@@ -193,16 +193,18 @@ router.get('/:user/:fase/montarpalpites2', async (req, res, next) => {
 		Time.find({}),
 		Partida.find({ fase }).sort({ 'data': 'asc' }),
 		Palpite.find({ user })
-	]).then(resultados => {
-		console.log(resultados)
-		let [times, partidas, palpites] = resultados;
+	]).then(([times, partidas, palpites]) => {
 		if (palpites && palpites.length > 0) {
-			return palpites
+			return Promise.all([Promise.resolve(palpites), Promise.resolve(times)])
 		} else {
 			partidas.forEach(partida => { palpites.push({ user, partida: partida._id }) })
-			return Palpite.insertMany(palpites);
+			return Promise.all([Palpite.insertMany(palpites), Promise.resolve(times)])
 		}
-	}).then(palpites => {
+	}).then(([palpites, times]) => {
+		console.log('times')
+		console.log(times)
+		console.log('palpites')
+		console.log(palpites)
 		const grupos = montarPalpites(palpites, partidas, times)
 		respondSuccess(res, 200, { data: grupos })
 	}).catch(err => {
