@@ -198,7 +198,6 @@ router.get('/:user/:fase/montarpalpites2', async (req, res, next) => {
 		if (palpites && palpites.length > 0) {
 			return palpites
 		} else {
-			palpites = []
 			partidas.forEach(partida => { palpites.push({ user, partida: partida._id }) })
 			return Palpite.insertMany(palpites);
 		}
