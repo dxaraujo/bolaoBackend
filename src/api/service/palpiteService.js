@@ -3,7 +3,7 @@ const ObjectId = require('mongoose').mongo.ObjectId
 const Palpite = require('../model/palpite')
 const Partida = require('../model/partida')
 const Time = require('../model/time')
-const { respondOrErr, respondErr, handlerError } = require('../../util/serviceUtils')
+const { respondOrErr, respondSuccess, respondErr, handlerError } = require('../../util/serviceUtils')
 
 const router = express.Router()
 
@@ -191,24 +191,27 @@ router.get('/:user/:fase/montarpalpites2', async (req, res, next) => {
 
 	const times = await Time.find({})
 	console.log('times')
-	console.log(times)
+	console.log(times.length)
 	const partidas = await Partida.find({ fase }).sort({ 'data': 'asc' })
 	console.log('partidas')
-	console.log(partidas)
+	console.log(partidas.length)
 	const palpites = await Palpite.find({ user })
 	console.log('palpites')
-	console.log(palpites)
+	console.log(palpites.length)
 
 	if (palpites && palpites.length > 0) {
 		const grupos = montarPalpites(palpites, parts, times)
 		respondOrErr(res, next, 500, err, 200, { data: grupos })
 	} else {
+		console.log('sem palpites')
 		partidas.forEach(partida => {
 			palpites.push({ user, partida: partida._id })
 		})
 		Palpite.insertMany(palpites).then(palpites => {
 			const grupos = montarPalpites(palpites, parts, times)
-			respondOrErr(res, next, 500, err, 200, { data: grupos })
+			respondSuccess(res, 200, { data: grupos })
+		}).catch(err => {
+			respondErr(next, 500, { errors: err })
 		})
 	}
 })
