@@ -179,3 +179,30 @@ const montarPalpites = (palpites, partidas, times) => {
 router.use(handlerError)
 
 exports = module.exports = router
+
+
+/*
+	Teste  da funcção de comentário
+*/
+router.get('/:user/:fase/montarpalpites2', async (req, res, next) => {
+
+	const user = req.params.user
+	const fase = req.params.fase
+
+	const times = await Time.find({})
+	const partidas = await Partida.find({ fase }).sort({ 'data': 'asc' })
+	const palpites = await Palpite.find({ user })
+
+	if (palpites && palpites.length > 0) {
+		const grupos = montarPalpites(palpites, parts, times)
+		respondOrErr(res, next, 500, err, 200, { data: grupos })
+	} else {
+		partidas.forEach(partida => {
+			palpites.push({ user, partida: partida._id })
+		})
+		Palpite.insertMany(palpites).then(palpites => {
+			const grupos = montarPalpites(palpites, parts, times)
+			respondOrErr(res, next, 500, err, 200, { data: grupos })
+		})
+	}
+})
