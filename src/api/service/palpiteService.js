@@ -1,8 +1,6 @@
 const express = require('express')
-const ObjectId = require('mongoose').mongo.ObjectId
 const Palpite = require('../model/palpite')
 const Partida = require('../model/partida')
-const Time = require('../model/time')
 const { respondOrErr, respondSuccess, respondErr, handlerError } = require('../../util/serviceUtils')
 
 const router = express.Router()
@@ -55,15 +53,17 @@ const montarPalpiteUpdate = (palpites) => {
 	return palp
 }
 
-router.get('/:user/:fase/montarpalpites', async (req, res, next) => {
+router.get('/:user/:fase/montarpalpites', (req, res, next) => {
 	const user = req.params.user
 	const fase = req.params.fase
 	Palpite.find({ user }).then(async palpites => {
 		let partidas = await Partida.find({ fase }).sort({ 'data': 'asc' })
-		if (palpites.length < 1) {
-			delete partida.placarTimeA
-			delete partida.placarTimeB
-			partidas.forEach(partida => { palpites.push({ user, partida }) })
+		if (!palpites.length) {
+			partidas.forEach(partida => {
+				delete partida.placarTimeA
+				delete partida.placarTimeB
+				palpites.push({ user, partida })
+			})
 			palpites = await Palpite.insertMany(palpites)
 		}
 		const grupos = montarPalpites(palpites)
