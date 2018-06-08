@@ -86,13 +86,13 @@ const montarPalpites = (palpites) => {
 		let partida = palpites[idx].partida
 		if (partida.grupo === grupos[gidx].nome) {
 			if (partida.rodada === rodadas[ridx].nome) {
-				rodadas[ridx].palpites.push({ ...palpites[idx++] })
+				rodadas[ridx].palpites.push(palpites[idx++])
 			} else {
 				// NOVA RODADA PARA O MESMO GRUPO
 				++ridx
 				rodada = { nome: palpites[idx].partida.rodada, palpites: [] }
 				rodadas.push(rodada)
-				rodadas[ridx].palpites.push({ ...palpites[idx++] })
+				rodadas[ridx].palpites.push(palpites[idx++])
 			}
 		} else {
 			//NOVO GRUPO

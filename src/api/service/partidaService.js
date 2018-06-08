@@ -79,8 +79,6 @@ router.delete('/:id', (req, res, next) => {
 	})
 })
 
-router.use(handlerError)
-
 const calcularPontuacaoPalpite = (palpite, partida) => {
 	if (partida.placarTimeA && partida.placarTimeB) {
 		const palpiteTimeVencedor = palpite.placarTimeA > palpite.placarTimeB ? 'A' : palpite.placarTimeB > palpite.placarTimeA ? 'B' : 'E'
@@ -104,4 +102,5 @@ const calcularPontuacaoPalpite = (palpite, partida) => {
 	return palpite
 }
 
+router.use(handlerError)
 exports = module.exports = router
