@@ -38,12 +38,10 @@ router.post('/', (req, res, next) => {
 router.put('/:id/updateResultado', async (req, res, next) => {
 	try {
 
-		const newPartida = Partida.findByIdAndUpdate(req.params.id, req.body, { new: true })
+		const newPartida = await Partida.findByIdAndUpdate(req.params.id, req.body, { new: true })
 		const partidas = await Partida.find({}).sort({ 'data': 'asc' })
 		const users = await User.find({})
 		let mapPalpites = []
-
-		console.log(newPartida)
 
 		await asyncForEach(users, async user => {
 			let palpites = await Palpite.find({ user: user._id })
