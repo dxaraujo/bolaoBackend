@@ -19,7 +19,7 @@ const respondErr = (next, errStatusCode, err) => {
 
 const handlerError = (err, req, res, next) => {
 	const message = err.message
-	res.status(err.statusCode).json({ message });
+	res.status(err.statusCode).json({ errors: message });
 };
 
 const createService = (model) => {

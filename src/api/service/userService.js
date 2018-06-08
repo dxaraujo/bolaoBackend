@@ -6,23 +6,20 @@ const { respondOrErr, respondErr, respondSuccess, handlerError } = require('../.
 
 const router = express.Router()
 
-router.get('/', (req, res, next) => {
-	co(function* () {
-		let users = yield User.find(req.query)
-		for (let i = 0; i < users.length; i++) {
-			let user = users[i];
-			let palpites = yield Palpite.find({ user: user._id})
-			let totalAcumulado = 0
-			for (let j = 0; j < palpites.length; j++) {
-				totalAcumulado+= palpites[j].totalPontosObitidos
-			}
-			user.palpites = palpites
-			user.totalAcumulado = totalAcumulado
-		}
+router.get('/', async (req, res, next) => {
+	try {
+		let users = await User.find(req.query)
+		users.forEach(async user => {
+			user.totalAcumulado = 0
+			user.palpites = await Palpite.find({ user: user._id})
+			user.palpites.forEach(palpite => {
+				user.totalAcumulado += palpite.totalPontosObitidos
+			})
+		})
 		respondSuccess(res, 200, { data: users })
-	}).catch(err => {
+	} catch(err) {
 		respondErr(next, 500, err)
-	});
+	}
 })
 
 router.get('/:id', (req, res, next) => {
