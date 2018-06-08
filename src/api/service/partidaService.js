@@ -61,7 +61,7 @@ router.put('/:id/updateResultado', async (req, res, next) => {
 		console.log(users)
 		partidas.forEach(async partida => {
 			if (partida.placarTimeA && partida.placarTimeB) {
-				let palpites = users.map(user => findPalpite(users.palpites, partida))
+				let palpites = users.map(user => findPalpite(user.palpites, partida))
 				console.log('palpites')
 				console.log(palpites)
 				palpites = palpites.sort((p1, p2) => p1.totalAcumulado < p2.totalAcumulado)
