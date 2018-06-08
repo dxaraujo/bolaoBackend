@@ -106,17 +106,12 @@ const classificarUsuarios = async (partida, palpites) => {
 		for (let i = 0; i < palpites.length; i++) {
 			palpites[i].classificacao = i + 1
 			palpites[i] = await Palpite.findByIdAndUpdate(palpites[i]._id, palpites[i])
-			console.log('terminou')
 		}
 	}
 	return partida
 }
 
 const calcularPontuacaoPalpite = (palpite, partida) => {
-	console.log('palpite')
-	console.log(palpite)
-	console.log('partida')
-	console.log(partida)
 	const palpiteTimeVencedor = palpite.placarTimeA > palpite.placarTimeB ? 'A' : palpite.placarTimeB > palpite.placarTimeA ? 'B' : 'E'
 	const partidaTimeVencedor = partida.placarTimeA > partida.placarTimeB ? 'A' : partida.placarTimeB > partida.placarTimeA ? 'B' : 'E'
 	if (palpite.placarTimeA === partida.placarTimeA && palpite.placarTimeB === partida.placarTimeB) {
