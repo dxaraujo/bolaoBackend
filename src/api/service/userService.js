@@ -7,8 +7,10 @@ const { respondOrErr, respondErr, respondSuccess, handlerError } = require('../.
 const router = express.Router()
 
 router.get('/', async (req, res, next) => {
-	User.findById(req.query, (err, data) => {
-		respondOrErr(res, next, 500, err, 200, { data })
+	User.find(req.query).then(data => {
+		respondSuccess(res, 200, { data })
+	}).catch(err => {
+		respondErr(next, 500, err)
 	});
 })
 
