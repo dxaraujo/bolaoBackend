@@ -39,10 +39,9 @@ router.put('/:id/updateResultado', async (req, res, next) => {
 	Partida.findByIdAndUpdate(req.params.id, req.body, { new: true }).then(async newPartida => {
 		const partidas = await Partida.find({}).sort({ 'data': 'asc' })
 		const users = await User.find({})
+		let mapPalpites = []
 		users = users.map(async user => {
 			let palpites = await Palpite.find({ user: user._id })
-			console.log('palpites')
-			console.log(palpites)
 			user.totalAcumulado = 0
 			partidas.forEach(async partida => {
 				if (partida.placarTimeA && partida.placarTimeB) {
@@ -56,9 +55,12 @@ router.put('/:id/updateResultado', async (req, res, next) => {
 					console.log(palpite)
 				}
 			})
+			mapPalpites[user_id] = palpites
 			return await User.findByIdAndUpdate(user._id, { totalAcumulado: user.totalAcumulado })
 		})
 		console.log('chegou antes que devia')
+		console.log(mapPalpites)
+		/*
 		partidas.forEach(async partida => {
 			if (partida.placarTimeA && partida.placarTimeB) {
 				let palpites = users.map(user => findPalpite(user.palpites, partida))
@@ -76,6 +78,7 @@ router.put('/:id/updateResultado', async (req, res, next) => {
 				}
 			}
 		})
+		*/
 		respondSuccess(res, 200, { data: newPartida })
 	}).catch(err => {
 		respondErr(next, 500, err)
@@ -100,8 +103,7 @@ const findPalpite = (palpites, partida) => {
 			palpite.partida.grupo === partida.grupo &&
 			palpite.partida.rodada === partida.rodada &&
 			palpite.partida.timeA.nome === partida.timeA.nome &&
-			palpite.partida.timeA.nome === partida.timeA.nome &&
-			palpite.partida.data === partida.data
+			palpite.partida.timeA.nome === partida.timeA.nome
 	})
 }
 
