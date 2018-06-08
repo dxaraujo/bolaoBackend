@@ -46,8 +46,6 @@ router.put('/:id/updateResultado', async (req, res, next) => {
 			partidas.forEach(async partida => {
 				if (partida.placarTimeA && partida.placarTimeB) {
 					let palpite = findPalpite(palpites, partida)
-					console.log('palpite')
-					console.log(palpite)
 					palpite = calcularPontuacaoPalpite(palpite, partida)
 					user.totalAcumulado += palpite.totalPontosObitidos
 					palpite.totalAcumulado = user.totalAcumulado
@@ -98,12 +96,14 @@ router.delete('/:id', (req, res, next) => {
 })
 
 const findPalpite = (palpites, partida) => {
-	palpites.find(palpite => {
-		return palpite.partida.fase === partida.fase &&
-			palpite.partida.grupo === partida.grupo &&
-			palpite.partida.rodada === partida.rodada &&
-			palpite.partida.timeA.nome === partida.timeA.nome &&
-			palpite.partida.timeA.nome === partida.timeA.nome
+	console.log(partida)
+	console.log(palpites)
+	return palpites.find(palpite => {
+		return palpite.partida.fase.valueOf() === partida.fase.valueOf() &&
+			palpite.partida.grupo.valueOf() === partida.grupo.valueOf() &&
+			palpite.partida.rodada.valueOf() === partida.rodada.valueOf() &&
+			palpite.partida.timeA.nome.valueOf() === partida.timeA.nome.valueOf() &&
+			palpite.partida.timeA.nome.valueOf() === partida.timeA.nome.valueOf()
 	})
 }
 
