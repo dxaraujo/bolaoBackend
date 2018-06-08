@@ -43,6 +43,14 @@ const palpiteSchema = new mongoose.Schema({
 		type: Boolean,
 		required: true,
 		default: false
+	},
+	classificacao: {
+		type: Number,
+		required: false
+	},
+	totalAcumulado: {
+		type: Number,
+		required: false
 	}
 })
 
