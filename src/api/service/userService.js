@@ -7,19 +7,9 @@ const { respondOrErr, respondErr, respondSuccess, handlerError } = require('../.
 const router = express.Router()
 
 router.get('/', async (req, res, next) => {
-	try {
-		let users = await User.find(req.query)
-		users.forEach(async user => {
-			user.totalAcumulado = 0
-			user.palpites = await Palpite.find({ user: user._id})
-			user.palpites.forEach(palpite => {
-				user.totalAcumulado += palpite.totalPontosObitidos
-			})
-		})
-		respondSuccess(res, 200, { data: users })
-	} catch(err) {
-		respondErr(next, 500, err)
-	}
+	User.findById(req.query, (err, data) => {
+		respondOrErr(res, next, 500, err, 200, { data })
+	});
 })
 
 router.get('/:id', (req, res, next) => {
