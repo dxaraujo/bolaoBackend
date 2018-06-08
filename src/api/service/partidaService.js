@@ -41,13 +41,10 @@ router.put('/:id/updateResultado', async (req, res, next) => {
 			partidas.forEach(async partida => {
 				let palpite = await Palpite.findOne({ user: user._id, partida: partida._id })
 				if (palpite) {
-
 					palpite = calcularPontuacaoPalpite(palpite, partida)
 					palpite.partida = partida
-
 					user.totalAcumulado += palpite.totalPontosObitidos
 					palpite.totalAcumulado = user.totalAcumulado
-
 					user.palpites.push(palpite)
 				}
 			})
