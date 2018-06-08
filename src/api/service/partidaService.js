@@ -49,11 +49,13 @@ router.put('/:id/updateResultado', async (req, res, next) => {
 			mapPalpites[user._id] = palpites
 			autalizarTotalAcumulado(user, partidas, palpites)
 			user = await User.findByIdAndUpdate(user._id, { totalAcumulado: user.totalAcumulado })
+			console.log(user)
 		})
+		console.log('1.1')
 		console.log(mapPalpites)
 
 		console.log('2')
-		await partidas.forEachAsync(async partida => {
+		asyncForEach(partidas, async partida => {
 			let palpites = users.map(user => findPalpite(mapPalpites[user._id], partida))
 			await classificarUsuarios(partida, palpites)
 		})
