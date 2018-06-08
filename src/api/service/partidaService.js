@@ -46,9 +46,13 @@ router.put('/:id/updateResultado', async (req, res, next) => {
 			partidas.forEach(async partida => {
 				if (partida.placarTimeA && partida.placarTimeB) {
 					let palpite = findPalpite(palpites, partida)
+					console.log('palpite')
+					console.log(palpite)
 					palpite = calcularPontuacaoPalpite(palpite, partida)
 					user.totalAcumulado += palpite.totalPontosObitidos
 					palpite.totalAcumulado = user.totalAcumulado
+					console.log('calculado')
+					console.log(palpite)
 					user = await User.findByIdAndUpdate(user._id, user)
 					user.palpites.push(palpite)
 				}
