@@ -32,19 +32,39 @@ router.post('/', (req, res, next) => {
 })
 
 router.put('/:id/updateResultado', async (req, res, next) => {
-	try {
-		const partida = await Partida.findByIdAndUpdate(req.params.id, req.body, { new: true })
+	Partida.findByIdAndUpdate(req.params.id, req.body, { new: true }).then(async newPartida => {
+		const partidas = await Partida.find({}).sort({ 'data': 'asc' })
 		const users = await User.find({})
 		users.forEach(async user => {
-			let palpite = await Palpite.findOne({ user: user._id, partida: partida._id })
-			palpite = processarPontuacaoPalpites(partida, palpite)
-			await Palpite.findByIdAndUpdate(palpite._id, palpite)
+			user.palpites = []
+			user.totalAcumulado = 0
+			partidas.forEach(partida => {
+				let palpite = await Palpite.findOne({ user: user._id, partida: partida._id })
+				if (palpite) {
+
+					palpite = calcularPontuacaoPalpite(palpite, partida)
+					palpite.partida = partida
+
+					user.totalAcumulado += palpite.totalPontosObitidos
+					palpite.totalAcumulado = user.totalAcumulado
+
+					user.palpites.push(palpite)
+				}
+			})
 		})
-		processarHistoricoPontuacaoes()
-		respondSuccess(res, 200, { data: partida })
-	} catch (err) {
+		partidas.forEach(partida => {
+			let palpites = users.map(user => user.palpites.find(palpite => palpite.partida._id === partida._id))
+			palpites = palpites.sort((p1, p2) => p1.totalAcumulado < p2.totalAcumulado)
+			for (let i = 0; i < palpites.length; i++) {
+				let palpite = palpites[i]
+				palpite.classificacao = i + 1
+				await Palpite.findByIdAndUpdate(palpite._id, palpite)
+			}
+		})
+		respondSuccess(res, 200, { data: newPartida })
+	}).catch(err => {
 		respondErr(next, 500, err)
-	}
+	})
 })
 
 router.put('/:id', (req, res, next) => {
@@ -61,47 +81,27 @@ router.delete('/:id', (req, res, next) => {
 
 router.use(handlerError)
 
-const processarPontuacaoPalpites = (partida, palpite) => {
-	const palpiteTimeVencedor = palpite.placarTimeA > palpite.placarTimeB ? 'A' : palpite.placarTimeB > palpite.placarTimeA ? 'B' : 'E'
-	const partidaTimeVencedor = partida.placarTimeA > partida.placarTimeB ? 'A' : partida.placarTimeB > partida.placarTimeA ? 'B' : 'E'
-	if (palpite.placarTimeA === partida.placarTimeA && palpite.placarTimeB === partida.placarTimeB) {
-		palpite.totalPontosObitidos = 5
-		palpite.placarCheio = true
-	} else if (palpiteTimeVencedor === partidaTimeVencedor) {
-		if (palpite.placarTimeA === partida.placarTimeA || palpite.placarTimeB === partida.placarTimeB) {
-			palpite.totalPontosObitidos = 3
-			palpite.placarTimeVencedorComGol = true
-		} else {
-			palpite.totalPontosObitidos = 2
-			palpite.placarTimeVencedor = true
+const calcularPontuacaoPalpite = (palpite, partida) => {
+	if (partida.placarTimeA && partida.placarTimeB) {
+		const palpiteTimeVencedor = palpite.placarTimeA > palpite.placarTimeB ? 'A' : palpite.placarTimeB > palpite.placarTimeA ? 'B' : 'E'
+		const partidaTimeVencedor = partida.placarTimeA > partida.placarTimeB ? 'A' : partida.placarTimeB > partida.placarTimeA ? 'B' : 'E'
+		if (palpite.placarTimeA === partida.placarTimeA && palpite.placarTimeB === partida.placarTimeB) {
+			palpite.totalPontosObitidos = 5
+			palpite.placarCheio = true
+		} else if (palpiteTimeVencedor === partidaTimeVencedor) {
+			if (palpite.placarTimeA === partida.placarTimeA || palpite.placarTimeB === partida.placarTimeB) {
+				palpite.totalPontosObitidos = 3
+				palpite.placarTimeVencedorComGol = true
+			} else {
+				palpite.totalPontosObitidos = 2
+				palpite.placarTimeVencedor = true
+			}
+		} else if (palpite.placarTimeA === partida.placarTimeA || palpite.placarTimeB === partida.placarTimeB) {
+			palpite.totalPontosObitidos = 1
+			palpite.placarGol = true
 		}
-	} else if (palpite.placarTimeA === partida.placarTimeA || palpite.placarTimeB === partida.placarTimeB) {
-		palpite.totalPontosObitidos = 1
-		palpite.placarGol = true
 	}
 	return palpite
-}
-
-const processarHistoricoPontuacaoes = async () => {
-	let partidas = await Partida.find({}).sort({ 'data': 'asc' })
-	let users = await User.find({})
-	users.forEach(async user => {
-		user.palpites = []
-		user.totalAcumulado = 0
-		partidas.forEach(async partida => {
-			if (partida.placarTimeA && partida.placarTimeB) {
-				let palpite = await Palpite.findOne({ user: user._id, partida: partida._id })
-				if (palpite) {
-					palpite = processarPontuacaoPalpites(partida, palpite)
-					user.totalAcumulado += palpite.totalPontosObitidos
-					palpite.totalAcumulado = totalAcumulado
-					palpite = await Palpite.findByIdAndUpdate(palpite._id, palpite, { new: true })
-					user.palpites.push(palpite)
-				}
-			}
-		})
-		await User.findByIdAndUpdate(user._id, user)
-	})
 }
 
 exports = module.exports = router
