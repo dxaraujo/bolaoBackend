@@ -47,15 +47,13 @@ router.put('/:id/updateResultado', async (req, res, next) => {
 			let palpites = await Palpite.find({ user: user._id })
 			mapPalpites[user._id] = palpites
 			user = autalizarTotalAcumulado(user, partidas, palpites)
-			user = await User.findByIdAndUpdate(user._id, { totalAcumulado: user.totalAcumulado })
+			user = await User.findByIdAndUpdate(user._id, { totalAcumulado: user.totalAcumulado }, { new: true })
 			console.log('user', user.totalAcumulado)
 		})
 
 		await asyncForEach(partidas, async partida => {
 			let palpites = users.map(user => findPalpite(mapPalpites[user._id], partida))
-			console.log('1.palpites ', palpites.length)
 			palpites = await classificarPalpites(partida, palpites)
-			console.log('2.palpites ', palpites.length)
 		})
 
 		respondSuccess(res, 200, { data: newPartida })
@@ -108,7 +106,7 @@ const classificarPalpites = async (partida, palpites) => {
 		palpites = palpites.sort((p1, p2) => p1.totalAcumulado < p2.totalAcumulado)
 		for (let i = 0; i < palpites.length; i++) {
 			palpites[i].classificacao = i + 1
-			palpites[i] = await Palpite.findByIdAndUpdate(palpites[i]._id, palpites[i])
+			palpites[i] = await Palpite.findByIdAndUpdate(palpites[i]._id, palpites[i], { new: true })
 		}
 	}
 	return palpites
