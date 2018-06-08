@@ -39,7 +39,7 @@ router.put('/:user/updatePalpites', (req, res, next) => {
 	try {
 		let palpites = []
 		req.body.forEach(async palpite => {
-			const palpite = await Palpite.findByIdAndUpdate({ _id: palpite._id }, { placarTimeA: palpite.placarTimeA, placarTimeB: palpite.placarTimeB }, { new: true })
+			palpite = await Palpite.findByIdAndUpdate(palpite._id, { placarTimeA: palpite.placarTimeA, placarTimeB: palpite.placarTimeB }, { new: true })
 			palpites.push(palpite)
 		})
 		respondSuccess(res, 200, { data: palpites })
