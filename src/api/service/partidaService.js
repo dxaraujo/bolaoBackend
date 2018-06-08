@@ -46,15 +46,22 @@ router.put('/:id/updateResultado', async (req, res, next) => {
 				let palpite = await Palpite.findOne({ user: user._id, partida: partida._id })
 				if (palpite) {
 					palpite = calcularPontuacaoPalpite(palpite, partida)
-					palpite.partida = partida
 					user.totalAcumulado += palpite.totalPontosObitidos
 					palpite.totalAcumulado = user.totalAcumulado
+					palpite = await Palpite.findByIdAndUpdate(palpite._id, palpite)
 					user.palpites.push(palpite)
 				}
 			})
 		})
 		partidas.forEach(async partida => {
-			let palpites = users.map(user => user.palpites.find(palpite => palpite.partida._id === partida._id))
+			let palpites = users.map(user => user.palpites.find(palpite => {
+				return palpite.partida.fase === partida.fase &&
+					palpite.partida.grupo === partida.grupo &&
+					palpite.partida.rodada === partida.rodada &&
+					palpite.partida.timeA.nome === partida.timeA.nome &&
+					palpite.partida.timeA.nome === partida.timeA.nome &&
+					palpite.partida.data === partida.data
+			}))
 			palpites = palpites.sort((p1, p2) => p1.totalAcumulado < p2.totalAcumulado)
 			for (let i = 0; i < palpites.length; i++) {
 				if (palpites[i]) {
