@@ -57,9 +57,11 @@ router.put('/:id/updateResultado', async (req, res, next) => {
 			let palpites = users.map(user => user.palpites.find(palpite => palpite.partida._id === partida._id))
 			palpites = palpites.sort((p1, p2) => p1.totalAcumulado < p2.totalAcumulado)
 			for (let i = 0; i < palpites.length; i++) {
-				let palpite = palpites[i]
-				palpite.classificacao = i + 1
-				await Palpite.findByIdAndUpdate(palpite._id, palpite)
+				if (palpites[i]) {
+					let palpite = palpites[i]
+					palpite.classificacao = i + 1
+					await Palpite.findByIdAndUpdate(palpite._id, palpite)
+				}
 			}
 		})
 		respondSuccess(res, 200, { data: newPartida })
