@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const Time = require('./time')
 
 const partidaSchema = new mongoose.Schema({
 	fase: {
@@ -43,7 +44,7 @@ const partidaSchema = new mongoose.Schema({
 		required: true
 	},
 	timeA: {
-		type: mongoose.Schema.ObjectId,
+		type: Time.schema,
 		required: true
 	},
 	placarTimeA: {
@@ -51,7 +52,7 @@ const partidaSchema = new mongoose.Schema({
 		required: true
 	},
 	timeB: {
-		type: mongoose.Schema.ObjectId,
+		type: Time.schema,
 		required: true
 	},
 	placarTimeB: {
