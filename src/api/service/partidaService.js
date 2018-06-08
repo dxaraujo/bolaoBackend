@@ -32,34 +32,6 @@ router.post('/', (req, res, next) => {
 })
 
 router.put('/:id/updateResultado', async (req, res, next) => {
-<<<<<<< HEAD
-	const partida = await Partida.findByIdAndUpdate(req.params.id, req.body, { new: true })
-	const users = await User.find({})
-	users.forEach(user => {
-		const palpite = await Palpite.findOne({ user: user._id, partida: partida._id })
-		if (palpite != null) {
-			const palpiteTimeVencedor = palpite.placarTimeA > palpite.placarTimeB ? 'A' : palpite.placarTimeB > palpite.placarTimeA ? 'B' : 'E'
-			const partidaTimeVencedor = partida.placarTimeA > partida.placarTimeB ? 'A' : partida.placarTimeB > partida.placarTimeA ? 'B' : 'E'
-			if (palpite.placarTimeA === partida.placarTimeA && palpite.placarTimeB === partida.placarTimeB) {
-				palpite.totalPontosObitidos = 5
-				palpite.placarCheio = true
-			} else if (palpiteTimeVencedor === partidaTimeVencedor) {
-				if (palpite.placarTimeA === partida.placarTimeA || palpite.placarTimeB === partida.placarTimeB) {
-					palpite.totalPontosObitidos = 3
-					palpite.placarTimeVencedorComGol = true
-				} else {
-					palpite.totalPontosObitidos = 2
-					palpite.placarTimeVencedor = true
-				}
-			} else if (palpite.placarTimeA === partida.placarTimeA || palpite.placarTimeB === partida.placarTimeB) {
-				palpite.totalPontosObitidos = 1
-				palpite.placarGol = true
-			}
-			await Palpite.findByIdAndUpdate(palpite._id, palpite)
-		}
-	})
-	respondSuccess(res, 200, { data: partida })
-=======
 	try {
 		const partida = await Partida.findByIdAndUpdate(req.params.id, req.body, { new: true })
 		const users = await User.find({})
@@ -73,7 +45,6 @@ router.put('/:id/updateResultado', async (req, res, next) => {
 	} catch (err) {
 		respondErr(next, 500, err)
 	}
->>>>>>> 5322910f1d32e1a4936e2846f3cd5e8b4b0406bf
 })
 
 router.put('/:id', (req, res, next) => {
@@ -90,8 +61,6 @@ router.delete('/:id', (req, res, next) => {
 
 router.use(handlerError)
 
-<<<<<<< HEAD
-=======
 const processarPontuacaoPalpites = (partida, palpite) => {
 	const palpiteTimeVencedor = palpite.placarTimeA > palpite.placarTimeB ? 'A' : palpite.placarTimeB > palpite.placarTimeA ? 'B' : 'E'
 	const partidaTimeVencedor = partida.placarTimeA > partida.placarTimeB ? 'A' : partida.placarTimeB > partida.placarTimeA ? 'B' : 'E'
@@ -135,5 +104,4 @@ const processarHistoricoPontuacaoes = async () => {
 	})
 }
 
->>>>>>> 5322910f1d32e1a4936e2846f3cd5e8b4b0406bf
 exports = module.exports = router
