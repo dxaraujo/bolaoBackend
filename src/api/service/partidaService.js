@@ -42,16 +42,15 @@ router.put('/:id/updateResultado', async (req, res, next) => {
 		users.forEach(async user => {
 			user.palpites = []
 			user.totalAcumulado = 0
+			let palpites = await Palpite.findOne({ user: user._id })
 			partidas.forEach(async partida => {
 				if (partida.placarTimeA && partida.placarTimeB) {
-					let palpite = await Palpite.findOne({ user: user._id, partida: partida._id })
-					if (palpite) {
-						palpite = calcularPontuacaoPalpite(palpite, partida)
-						user.totalAcumulado += palpite.totalPontosObitidos
-						palpite.totalAcumulado = user.totalAcumulado
-						user = User.findByIdAndUpdate(user._id, user)
-						user.palpites.push(palpite)
-					}
+					let palpite = findPalpite(palpites, partida)
+					palpite = calcularPontuacaoPalpite(palpite, partida)
+					user.totalAcumulado += palpite.totalPontosObitidos
+					palpite.totalAcumulado = user.totalAcumulado
+					user = await User.findByIdAndUpdate(user._id, user)
+					user.palpites.push(palpite)
 				}
 			})
 		})
@@ -59,14 +58,7 @@ router.put('/:id/updateResultado', async (req, res, next) => {
 		console.log(users)
 		partidas.forEach(async partida => {
 			if (partida.placarTimeA && partida.placarTimeB) {
-				let palpites = users.map(user => user.palpites.find(palpite => {
-					return palpite.partida.fase === partida.fase &&
-						palpite.partida.grupo === partida.grupo &&
-						palpite.partida.rodada === partida.rodada &&
-						palpite.partida.timeA.nome === partida.timeA.nome &&
-						palpite.partida.timeA.nome === partida.timeA.nome &&
-						palpite.partida.data === partida.data
-				}))
+				let palpites = users.map(user => findPalpite(users.palpites, partida))
 				console.log('palpites')
 				console.log(palpites)
 				palpites = palpites.sort((p1, p2) => p1.totalAcumulado < p2.totalAcumulado)
@@ -98,6 +90,17 @@ router.delete('/:id', (req, res, next) => {
 		respondOrErr(res, next, 500, err, 200, { data })
 	})
 })
+
+const findPalpite = (palpites, partida) => {
+	palpites.find(palpite => {
+		return palpite.partida.fase === partida.fase &&
+			palpite.partida.grupo === partida.grupo &&
+			palpite.partida.rodada === partida.rodada &&
+			palpite.partida.timeA.nome === partida.timeA.nome &&
+			palpite.partida.timeA.nome === partida.timeA.nome &&
+			palpite.partida.data === partida.data
+	})
+}
 
 const calcularPontuacaoPalpite = (palpite, partida) => {
 	const palpiteTimeVencedor = palpite.placarTimeA > palpite.placarTimeB ? 'A' : palpite.placarTimeB > palpite.placarTimeA ? 'B' : 'E'
