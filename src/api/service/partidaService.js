@@ -37,20 +37,24 @@ router.post('/', (req, res, next) => {
 
 router.put('/:id/updateResultado', async (req, res, next) => {
 	try {
+
 		const newPartida = Partida.findByIdAndUpdate(req.params.id, req.body, { new: true })
 		const partidas = await Partida.find({}).sort({ 'data': 'asc' })
 		const users = await User.find({})
 		let mapPalpites = []
+
 		users = users.map(async user => {
 			let palpites = await Palpite.find({ user: user._id })
 			mapPalpites[user._id] = palpites
 			return autalizarTotalAcumulado(user, partidas, palpites)
 		})
+
 		console.log(mapPalpites)
 		partidas = partidas.map(partida => {
 			let palpites = users.map(user => findPalpite(mapPalpites[user._id], partida))
 			return classificarUsuarios(partida, palpites)
 		})
+
 		console.log('será que terminou?')
 		respondSuccess(res, 200, { data: newPartida })
 	} catch (err) {
@@ -71,15 +75,16 @@ router.delete('/:id', (req, res, next) => {
 })
 
 const findPalpite = (palpites, partida) => {
-	console.log(partida)
-	console.log(palpites)
-	return palpites.find(palpite => {
-		return palpite.partida.fase.valueOf() === partida.fase.valueOf() &&
-			palpite.partida.grupo.valueOf() === partida.grupo.valueOf() &&
-			palpite.partida.rodada.valueOf() === partida.rodada.valueOf() &&
-			palpite.partida.timeA.nome.valueOf() === partida.timeA.nome.valueOf() &&
-			palpite.partida.timeA.nome.valueOf() === partida.timeA.nome.valueOf()
+	const palpite = palpites.find(palpite => {
+		return palpite.partida.fase === partida.fase &&
+			palpite.partida.grupo === partida.grupo &&
+			palpite.partida.rodada === partida.rodada &&
+			palpite.partida.timeA.nome === partida.timeA.nome &&
+			palpite.partida.timeB.nome === partida.timeB.nome
 	})
+	console.log('palpite')
+	console.log(palpite)
+	return palpite
 }
 
 const autalizarTotalAcumulado = async (user, partidas, palpites) => {
@@ -109,22 +114,24 @@ const classificarUsuarios = async (partida, palpites) => {
 }
 
 const calcularPontuacaoPalpite = (palpite, partida) => {
-	const palpiteTimeVencedor = palpite.placarTimeA > palpite.placarTimeB ? 'A' : palpite.placarTimeB > palpite.placarTimeA ? 'B' : 'E'
-	const partidaTimeVencedor = partida.placarTimeA > partida.placarTimeB ? 'A' : partida.placarTimeB > partida.placarTimeA ? 'B' : 'E'
-	if (palpite.placarTimeA === partida.placarTimeA && palpite.placarTimeB === partida.placarTimeB) {
-		palpite.totalPontosObitidos = 5
-		palpite.placarCheio = true
-	} else if (palpiteTimeVencedor === partidaTimeVencedor) {
-		if (palpite.placarTimeA === partida.placarTimeA || palpite.placarTimeB === partida.placarTimeB) {
-			palpite.totalPontosObitidos = 3
-			palpite.placarTimeVencedorComGol = true
-		} else {
-			palpite.totalPontosObitidos = 2
-			palpite.placarTimeVencedor = true
+	if (palpite.placarTimeA && palpite.placarTimeB) {
+		const palpiteTimeVencedor = palpite.placarTimeA > palpite.placarTimeB ? 'A' : palpite.placarTimeB > palpite.placarTimeA ? 'B' : 'E'
+		const partidaTimeVencedor = partida.placarTimeA > partida.placarTimeB ? 'A' : partida.placarTimeB > partida.placarTimeA ? 'B' : 'E'
+		if (palpite.placarTimeA === partida.placarTimeA && palpite.placarTimeB === partida.placarTimeB) {
+			palpite.totalPontosObitidos = 5
+			palpite.placarCheio = true
+		} else if (palpiteTimeVencedor === partidaTimeVencedor) {
+			if (palpite.placarTimeA === partida.placarTimeA || palpite.placarTimeB === partida.placarTimeB) {
+				palpite.totalPontosObitidos = 3
+				palpite.placarTimeVencedorComGol = true
+			} else {
+				palpite.totalPontosObitidos = 2
+				palpite.placarTimeVencedor = true
+			}
+		} else if (palpite.placarTimeA === partida.placarTimeA || palpite.placarTimeB === partida.placarTimeB) {
+			palpite.totalPontosObitidos = 1
+			palpite.placarGol = true
 		}
-	} else if (palpite.placarTimeA === partida.placarTimeA || palpite.placarTimeB === partida.placarTimeB) {
-		palpite.totalPontosObitidos = 1
-		palpite.placarGol = true
 	}
 	return palpite
 }
