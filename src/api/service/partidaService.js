@@ -43,17 +43,26 @@ router.put('/:id/updateResultado', async (req, res, next) => {
 		const users = await User.find({})
 		let mapPalpites = []
 
+		console.log('1')
 		await asyncForEach(users, async user => {
 			let palpites = await Palpite.find({ user: user._id })
+			console.log('palpites ', palpites.length)
 			mapPalpites[user._id] = palpites
 			autalizarTotalAcumulado(user, partidas, palpites)
+			console.log('marco 1')
 			user = await User.findByIdAndUpdate(user._id, { totalAcumulado: user.totalAcumulado })
 		})
+		console.log('1.1')
+		console.log('mapPalpites', mapPalpites.length)
 
+		console.log('2')
 		await asyncForEach(partidas, async partida => {
 			let palpites = users.map(user => findPalpite(mapPalpites[user._id], partida))
-			await classificarUsuarios(partida, palpites)
+			console.log('palpites ', palpites.length)
+			palpites = await classificarPalpites(partida, palpites)
+			console.log('palpites ', palpites.length)
 		})
+		console.log('2.2')
 
 		respondSuccess(res, 200, { data: newPartida })
 	} catch (err) {
@@ -86,7 +95,7 @@ const findPalpite = (palpites, partida) => {
 
 const autalizarTotalAcumulado = (user, partidas, palpites) => {
 	user.totalAcumulado = 0
-	partidas.forEach(async partida => {
+	partidas.forEach(partida => {
 		if (partida.placarTimeA && partida.placarTimeB) {
 			let palpite = findPalpite(palpites, partida)
 			palpite = calcularPontuacaoPalpite(palpite, partida)
@@ -96,7 +105,7 @@ const autalizarTotalAcumulado = (user, partidas, palpites) => {
 	})
 }
 
-const classificarUsuarios = async (partida, palpites) => {
+const classificarPalpites = async (partida, palpites) => {
 	if (partida.placarTimeA && partida.placarTimeB) {
 		palpites = palpites.sort((p1, p2) => p1.totalAcumulado < p2.totalAcumulado)
 		for (let i = 0; i < palpites.length; i++) {
@@ -104,6 +113,7 @@ const classificarUsuarios = async (partida, palpites) => {
 			palpites[i] = await Palpite.findByIdAndUpdate(palpites[i]._id, palpites[i])
 		}
 	}
+	return palpites
 }
 
 const calcularPontuacaoPalpite = (palpite, partida) => {
