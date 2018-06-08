@@ -39,7 +39,7 @@ router.put('/:id/updateResultado', async (req, res, next) => {
 	Partida.findByIdAndUpdate(req.params.id, req.body, { new: true }).then(async newPartida => {
 		const partidas = await Partida.find({}).sort({ 'data': 'asc' })
 		const users = await User.find({})
-		await users.forEach(async user => {
+		users = users.map(async user => {
 			let palpites = await Palpite.find({ user: user._id })
 			user.palpites = palpites
 			user.totalAcumulado = 0
@@ -57,7 +57,7 @@ router.put('/:id/updateResultado', async (req, res, next) => {
 					console.log(palpite)
 				}
 			})
-			user = await User.findByIdAndUpdate(user._id, user)
+			return await User.findByIdAndUpdate(user._id, user)
 		})
 		console.log('chegou antes que devia')
 		partidas.forEach(async partida => {
