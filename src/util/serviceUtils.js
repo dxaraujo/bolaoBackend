@@ -1,5 +1,13 @@
 const express = require('express')
 
+Array.prototype.forEachAsync = async function (fn) {
+	for (let t of this) { await fn(t) }
+}
+
+Array.prototype.forEachAsyncParallel = async function (fn) {
+	await Promise.all(this.map(fn));
+}
+
 const respondOrErr = (res, next, errStatusCode, err, statusCode, data) => {
 	if (err) {
 		respondErr(next, errStatusCode, err)
