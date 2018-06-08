@@ -49,7 +49,7 @@ router.put('/:id/updateResultado', async (req, res, next) => {
 						palpite = calcularPontuacaoPalpite(palpite, partida)
 						user.totalAcumulado += palpite.totalPontosObitidos
 						palpite.totalAcumulado = user.totalAcumulado
-						palpite = await Palpite.findByIdAndUpdate(palpite._id, palpite)
+						user = User.findByIdAndUpdate(user._id, user)
 						user.palpites.push(palpite)
 					}
 				}
