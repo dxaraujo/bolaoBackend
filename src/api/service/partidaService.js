@@ -36,51 +36,26 @@ router.post('/', (req, res, next) => {
 })
 
 router.put('/:id/updateResultado', async (req, res, next) => {
-	Partida.findByIdAndUpdate(req.params.id, req.body, { new: true }).then(async newPartida => {
+	try {
+		const newPartida = Partida.findByIdAndUpdate(req.params.id, req.body, { new: true })
 		const partidas = await Partida.find({}).sort({ 'data': 'asc' })
 		const users = await User.find({})
 		let mapPalpites = []
 		users = users.map(async user => {
 			let palpites = await Palpite.find({ user: user._id })
-			user.totalAcumulado = 0
-			partidas.forEach(async partida => {
-				if (partida.placarTimeA && partida.placarTimeB) {
-					let palpite = findPalpite(palpites, partida)
-					palpite = calcularPontuacaoPalpite(palpite, partida)
-					user.totalAcumulado += palpite.totalPontosObitidos
-					palpite.totalAcumulado = user.totalAcumulado
-					console.log('calculado')
-					console.log(palpite)
-				}
-			})
-			mapPalpites[user_id] = palpites
-			return await User.findByIdAndUpdate(user._id, { totalAcumulado: user.totalAcumulado })
+			mapPalpites[user._id] = palpites
+			return autalizarTotalAcumulado(user, partidas, palpites)
 		})
-		console.log('chegou antes que devia')
 		console.log(mapPalpites)
-		/*
-		partidas.forEach(async partida => {
-			if (partida.placarTimeA && partida.placarTimeB) {
-				let palpites = users.map(user => findPalpite(user.palpites, partida))
-				console.log('palpites')
-				console.log(palpites)
-				palpites = palpites.sort((p1, p2) => p1.totalAcumulado < p2.totalAcumulado)
-				console.log('sort')
-				console.log(palpites)
-				for (let i = 0; i < palpites.length; i++) {
-					if (palpites[i]) {
-						let palpite = palpites[i]
-						palpite.classificacao = i + 1
-						await Palpite.findByIdAndUpdate(palpite._id, palpite)
-					}
-				}
-			}
+		partidas = partidas.map(partida => {
+			let palpites = users.map(user => findPalpite(mapPalpites[user._id], partida))
+			return classificarUsuarios(partida, palpites)
 		})
-		*/
+		console.log('será que terminou?')
 		respondSuccess(res, 200, { data: newPartida })
-	}).catch(err => {
+	} catch (err) {
 		respondErr(next, 500, err)
-	})
+	}
 })
 
 router.put('/:id', (req, res, next) => {
@@ -105,6 +80,32 @@ const findPalpite = (palpites, partida) => {
 			palpite.partida.timeA.nome.valueOf() === partida.timeA.nome.valueOf() &&
 			palpite.partida.timeA.nome.valueOf() === partida.timeA.nome.valueOf()
 	})
+}
+
+const autalizarTotalAcumulado = async (user, partidas, palpites) => {
+	user.totalAcumulado = 0
+	partidas.forEach(async partida => {
+		if (partida.placarTimeA && partida.placarTimeB) {
+			let palpite = findPalpite(palpites, partida)
+			palpite = calcularPontuacaoPalpite(palpite, partida)
+			user.totalAcumulado += palpite.totalPontosObitidos
+			palpite.totalAcumulado = user.totalAcumulado
+		}
+	})
+
+	return await User.findByIdAndUpdate(user._id, { totalAcumulado: user.totalAcumulado })
+}
+
+const classificarUsuarios = async (partida, palpites) => {
+	if (partida.placarTimeA && partida.placarTimeB) {
+		palpites = palpites.sort((p1, p2) => p1.totalAcumulado < p2.totalAcumulado)
+		for (let i = 0; i < palpites.length; i++) {
+			palpites[i].classificacao = i + 1
+			palpites[i] = await Palpite.findByIdAndUpdate(palpites[i]._id, palpites[i])
+			console.log('terminou')
+		}
+	}
+	return partida
 }
 
 const calcularPontuacaoPalpite = (palpite, partida) => {
