@@ -49,7 +49,7 @@ const partidaSchema = new mongoose.Schema({
 	},
 	placarTimeA: {
 		type: Number,
-		required: true
+		required: false
 	},
 	timeB: {
 		type: Time.schema,
@@ -57,7 +57,7 @@ const partidaSchema = new mongoose.Schema({
 	},
 	placarTimeB: {
 		type: Number,
-		required: true
+		required: false
 	}
 })
 
