@@ -40,9 +40,9 @@ router.put('/:id/updateResultado', async (req, res, next) => {
 		const partidas = await Partida.find({}).sort({ 'data': 'asc' })
 		const users = await User.find({})
 		users.forEach(async user => {
+			let palpites = await Palpite.find({ user: user._id })
 			user.palpites = []
 			user.totalAcumulado = 0
-			let palpites = await Palpite.findOne({ user: user._id })
 			partidas.forEach(async partida => {
 				if (partida.placarTimeA && partida.placarTimeB) {
 					let palpite = findPalpite(palpites, partida)
