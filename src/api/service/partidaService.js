@@ -41,7 +41,7 @@ router.put('/:id/updateResultado', async (req, res, next) => {
 		const users = await User.find({})
 		users = users.map(async user => {
 			let palpites = await Palpite.find({ user: user._id })
-			user.palpites = palpites
+			user._palpites = palpites
 			user.totalAcumulado = 0
 			console.log('user')
 			console.log(user)
@@ -96,7 +96,6 @@ router.delete('/:id', (req, res, next) => {
 })
 
 const findPalpite = (palpites, partida) => {
-	console.log()
 	palpites.find(palpite => {
 		return palpite.partida.fase === partida.fase &&
 			palpite.partida.grupo === partida.grupo &&
