@@ -1,11 +1,9 @@
 const express = require('express')
 
-Array.prototype.forEachAsync = async function (fn) {
-	for (let t of this) { await fn(t) }
-}
-
-Array.prototype.forEachAsyncParallel = async function (fn) {
-	await Promise.all(this.map(fn));
+async function asyncForEach(array, callback) {
+	for (let index = 0; index < array.length; index++) {
+		await callback(array[index], index, array)
+	}
 }
 
 const respondOrErr = (res, next, errStatusCode, err, statusCode, data) => {
@@ -74,4 +72,4 @@ const createService = (model) => {
 	return router
 }
 
-module.exports = { createService, respondOrErr, respondErr, respondSuccess, handlerError }
+module.exports = { createService, respondOrErr, respondErr, respondSuccess, handlerError, asyncForEach }
