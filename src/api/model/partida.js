@@ -58,10 +58,6 @@ const partidaSchema = new mongoose.Schema({
 	placarTimeB: {
 		type: Number,
 		required: true
-	},
-	resultadoPartida: {
-		type: String,
-		required: true
 	}
 })
 

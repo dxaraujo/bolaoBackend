@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const Partida = require('./partida')
 
 const palpiteSchema = new mongoose.Schema({
 	user: {
@@ -6,7 +7,7 @@ const palpiteSchema = new mongoose.Schema({
 		required: true
 	},
 	partida: {
-		type: mongoose.Schema.ObjectId,
+		type: Partida.schema,
 		required: true
 	},
 	placarTimeA: {
