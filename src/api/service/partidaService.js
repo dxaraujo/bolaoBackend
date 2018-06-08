@@ -41,13 +41,12 @@ router.put('/:id/updateResultado', async (req, res, next) => {
 		const users = await User.find({})
 		users = users.map(async user => {
 			let palpites = await Palpite.find({ user: user._id })
-			user._palpites = palpites
+			console.log('palpites')
+			console.log(palpites)
 			user.totalAcumulado = 0
-			console.log('user')
-			console.log(user)
 			partidas.forEach(async partida => {
 				if (partida.placarTimeA && partida.placarTimeB) {
-					let palpite = findPalpite(user.palpites, partida)
+					let palpite = findPalpite(palpites, partida)
 					console.log('palpite')
 					console.log(palpite)
 					palpite = calcularPontuacaoPalpite(palpite, partida)
@@ -57,7 +56,7 @@ router.put('/:id/updateResultado', async (req, res, next) => {
 					console.log(palpite)
 				}
 			})
-			return await User.findByIdAndUpdate(user._id, user)
+			return await User.findByIdAndUpdate(user._id, { totalAcumulado: user.totalAcumulado })
 		})
 		console.log('chegou antes que devia')
 		partidas.forEach(async partida => {
