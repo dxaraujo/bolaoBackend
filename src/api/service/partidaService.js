@@ -45,15 +45,24 @@ router.put('/:id/updateResultado', async (req, res, next) => {
 		const users = await User.find({})
 		let mapPalpites = []
 
+		// Atualizado o total de ponto acumulados
 		await asyncForEach(users, async user => {
 			let palpites = await Palpite.find({ user: user._id })
 			mapPalpites[user._id] = palpites
 			user = await autalizarTotalAcumulado(user, partidas, palpites)
 		})
 
+		// Atualizado a classificação dos usuários
 		await asyncForEach(partidas, async partida => {
 			let palpites = users.map(user => findPalpite(mapPalpites[user._id], partida))
 			palpites = await classificarPalpites(partida, palpites)
+		})
+
+		// Atualizado os dados dos usuários
+		await asyncForEach(users, async user => {
+			const palpites = mapPalpites[user._id]
+			const palpite = palpites[palpites.length - 1]
+			user = await User.findByIdAndUpdate(user._id, { classificacao: palpite.classificacao }, { new: true })
 		})
 
 		respondSuccess(res, 200, { data: newPartida })
