@@ -2,6 +2,11 @@ const mongoose = require('mongoose')
 const Time = require('./time')
 
 const partidaSchema = new mongoose.Schema({
+	order: {
+		type: Number,
+		required: true,
+		default: 0
+	},
 	fase: {
 		type: String,
 		required: true,
