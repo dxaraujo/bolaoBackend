@@ -9,8 +9,10 @@ const { respondOrErr, respondSuccess, respondErr, handlerError, asyncForEach } =
 const router = express.Router()
 
 router.get('/', (req, res, next) => {
-	Partida.find(req.query, (err, data) => {
-		respondOrErr(res, next, 500, err, 200, { data })
+	Partida.find(req.query).sort({ data: 'asc' }), then(data => {
+		respondSuccess(res, 200, { data: partidas })
+	}).catch(err => {
+		respondErr(next, 500, err)
 	})
 })
 
