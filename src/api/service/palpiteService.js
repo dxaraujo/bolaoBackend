@@ -54,8 +54,9 @@ router.get('/:user/:fase/montarpalpites', (req, res, next) => {
 	Palpite.find({ user }).then(async palpites => {
 		let partidas = await Partida.find({ fase }).sort({ 'data': 'asc' })
 		for (let i = 0; i < partidas.length; i++) {
-			partidas[i] = await Palpite.findByIdAndUpdate(partidas[i]._id, { order: i }, { new: true })
+			partidas[i] = await Partida.findByIdAndUpdate(partidas[i]._id, { order: i }, { new: true })
 		}
+		console.log(partidas)
 		if (!palpites.length) {
 			partidas.forEach(partida => {
 				delete partida.placarTimeA
