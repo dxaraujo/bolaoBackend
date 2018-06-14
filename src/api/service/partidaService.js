@@ -117,14 +117,13 @@ const classificarPalpites = async (partida, palpites) => {
 }
 
 const calcularPontuacaoPalpite = (palpite, partida) => {
-	console.log('Palpite', palpite)
-	console.log('Partida', partida)
+	console.log('Iniciando calculo do Palpite')
 	const palpiteTimeVencedor = palpite.placarTimeA > palpite.placarTimeB ? 'A' : palpite.placarTimeB > palpite.placarTimeA ? 'B' : 'E'
 	const partidaTimeVencedor = partida.placarTimeA > partida.placarTimeB ? 'A' : partida.placarTimeB > partida.placarTimeA ? 'B' : 'E'
 	if (palpite.placarTimeA === partida.placarTimeA && palpite.placarTimeB === partida.placarTimeB) {
 		palpite.totalPontosObitidos = 5
 		palpite.placarCheio = true
-	} else if (palpiteTimeVencedor === partidaTimeVencedor) {
+	} else if (palpiteTimeVencedor === partidaTimeVencedor && palpite.placarTimeA && palpite.placarTimeB) {
 		if (palpite.placarTimeA === partida.placarTimeA || palpite.placarTimeB === partida.placarTimeB) {
 			palpite.totalPontosObitidos = 3
 			palpite.placarTimeVencedorComGol = true
@@ -136,6 +135,7 @@ const calcularPontuacaoPalpite = (palpite, partida) => {
 		palpite.totalPontosObitidos = 1
 		palpite.placarGol = true
 	}
+	console.log('Finazilando calculo do Palpite')
 	return palpite
 }
 
