@@ -53,7 +53,7 @@ router.put('/:id/updateResultado', async (req, res, next) => {
 		// Atualizado a classificação dos usuários
 		await asyncForEach(partidas, async partida => {
 			let palpites = users.map(user => findPalpite(mapPalpites[user._id], partida))
-			palpites = await classificarPalpites(partida, palpites)
+			palpites = await classificarPalpites(palpites)
 		})
 
 		// Atualizado os dados dos usuários
@@ -99,7 +99,6 @@ const autalizarTotalAcumulado = async (user, partidas, palpites) => {
 	partidas.forEach(partida => {
 		if (partida.placarTimeA >= 0 && partida.placarTimeB >= 0 && palpites) {
 			let palpite = findPalpite(palpites, partida)
-			console.log('Palpite', palpite)
 			if (palpite != null) {
 				palpite = calcularPontuacaoPalpite(palpite, partida)
 				user.totalAcumulado += palpite.totalPontosObitidos
@@ -110,15 +109,16 @@ const autalizarTotalAcumulado = async (user, partidas, palpites) => {
 	return await User.findByIdAndUpdate(user._id, { totalAcumulado: user.totalAcumulado }, { new: true })
 }
 
-const classificarPalpites = async (partida, palpites) => {
-	if (partida.placarTimeA >= 0 && partida.placarTimeB >= 0) {
-		palpites = palpites.sort((p1, p2) => p1.totalAcumulado < p2.totalAcumulado)
-		for (let i = 0; i < palpites.length; i++) {
-			if (palpites[i]) {
-				palpites[i].classificacao = i + 1
-				palpites[i] = await Palpite.findByIdAndUpdate(palpites[i]._id, palpites[i], { new: true })
-			}
+const classificarPalpites = async (palpites) => {
+	let cla = 1
+	palpites = palpites.filter(palpite => palpite)
+	palpites = palpites.sort((p1, p2) => p1.totalAcumulado < p2.totalAcumulado)
+	for (let i = 1; i < palpites.length; i++) {
+		if (i > 0) {
+			cla = palpites[i].totalAcumulado === palpites[i - 1].totalAcumulado ? clas : cla + 1
 		}
+		palpites[i].classificacao = cla
+		palpites[i] = await Palpite.findByIdAndUpdate(palpites[i]._id, palpites[i], { new: true })
 	}
 	return palpites
 }
