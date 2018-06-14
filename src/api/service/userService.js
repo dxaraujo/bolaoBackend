@@ -40,11 +40,11 @@ router.delete('/:id', (req, res, next) => {
 			const palpite = palpites[i];
 			console.log('Apagando palpite', palpite._id)
 			console.log(`placarTimeA: ${palpite.placarTimeA}, placarTimeB: ${palpite.placarTimeB}`)
-			const p = await Palpite.findByIdAndRemove(palpite._id, { select: true })
+			const p = await Palpite.findByIdAndRemove(palpite._id)
 			console.log('Palpite apagado', p)
 		}
 		console.log('Apagando usuário', user._id)
-		const data = await User.findByIdAndRemove(user._id, { select: true })
+		const data = await User.findByIdAndRemove(user._id)
 		console.log('Usuário apagado', u)
 		respondOrErr(res, next, 500, err, 200, { data })
 	}).catch(err => {
