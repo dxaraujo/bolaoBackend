@@ -97,11 +97,13 @@ const findPalpite = (palpites, partida) => {
 const autalizarTotalAcumulado = async (user, partidas, palpites) => {
 	user.totalAcumulado = 0
 	partidas.forEach(partida => {
-		if (partida.placarTimeA >= 0 && partida.placarTimeB >= 0 && palpite) {
+		if (partida.placarTimeA >= 0 && partida.placarTimeB >= 0) {
 			let palpite = findPalpite(palpites, partida)
-			palpite = calcularPontuacaoPalpite(palpite, partida)
-			user.totalAcumulado += palpite.totalPontosObitidos
-			palpite.totalAcumulado = user.totalAcumulado
+			if (palpite) {
+				palpite = calcularPontuacaoPalpite(palpite, partida)
+				user.totalAcumulado += palpite.totalPontosObitidos
+				palpite.totalAcumulado = user.totalAcumulado
+			}
 		}
 	})
 	return await User.findByIdAndUpdate(user._id, { totalAcumulado: user.totalAcumulado }, { new: true })
