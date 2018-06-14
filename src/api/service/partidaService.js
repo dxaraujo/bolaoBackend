@@ -16,7 +16,7 @@ router.get('/', (req, res, next) => {
 
 router.get('/resultado', async (req, res, next) => {
 	try {
-		const partidas = await Partida.find({}).sort({ data: 'asc' })
+		const partidas = await Partida.find({ data: { $lt: new Date() } }).sort({ data: 'asc' })
 		respondSuccess(res, 200, { data: partidas })
 	} catch (err) {
 		respondErr(next, 500, err)
