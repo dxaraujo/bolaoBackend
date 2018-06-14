@@ -125,7 +125,7 @@ const classificarPalpites = async (palpites) => {
 				mesmoplacar += 1
 				console.log('Palpite mesma classificacao anterior', cla)
 			} else {
-				cla = clas + mesmoplacar
+				cla = cla + mesmoplacar
 				mesmoplacar = 1
 				console.log('Palpite com classificacao diferente da anteriro', cla)
 			}
