@@ -118,7 +118,7 @@ const classificarPalpites = async (palpites) => {
 	palpites = palpites.sort((p1, p2) => p1.totalAcumulado < p2.totalAcumulado)
 	console.log('Palpite sort', palpites.length)
 	for (let i = 0; i < palpites.length; i++) {
-		console.log('Palpite', palpite.totalAcumulado)
+		console.log('Palpite', palpites[i].totalAcumulado)
 		if (i > 0) {
 			if (palpites[i].totalAcumulado === palpites[i - 1].totalAcumulado) {
 				cla = palpites[i - 1].classificacao
