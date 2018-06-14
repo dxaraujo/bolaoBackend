@@ -97,9 +97,10 @@ const findPalpite = (palpites, partida) => {
 const autalizarTotalAcumulado = async (user, partidas, palpites) => {
 	user.totalAcumulado = 0
 	partidas.forEach(partida => {
-		if (partida.placarTimeA >= 0 && partida.placarTimeB >= 0) {
+		if (partida.placarTimeA >= 0 && partida.placarTimeB >= 0 && palpites) {
 			let palpite = findPalpite(palpites, partida)
-			if (palpite) {
+			console.log('Palpite', palpite)
+			if (palpite != null) {
 				palpite = calcularPontuacaoPalpite(palpite, partida)
 				user.totalAcumulado += palpite.totalPontosObitidos
 				palpite.totalAcumulado = user.totalAcumulado
@@ -128,7 +129,7 @@ const calcularPontuacaoPalpite = (palpite, partida) => {
 	if (palpite.placarTimeA === partida.placarTimeA && palpite.placarTimeB === partida.placarTimeB) {
 		palpite.totalPontosObitidos = 5
 		palpite.placarCheio = true
-	} else if (palpiteTimeVencedor === partidaTimeVencedor && palpite.placarTimeA && palpite.placarTimeB) {
+	} else if (palpiteTimeVencedor === partidaTimeVencedor && palpite.placarTimeA >= 0 && palpite.placarTimeB >= 0) {
 		if (palpite.placarTimeA === partida.placarTimeA || palpite.placarTimeB === partida.placarTimeB) {
 			palpite.totalPontosObitidos = 3
 			palpite.placarTimeVencedorComGol = true
