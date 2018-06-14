@@ -46,22 +46,34 @@ router.put('/:id/updateResultado', async (req, res, next) => {
 		// Atualizado o total de ponto acumulados
 		await asyncForEach(users, async user => {
 			let palpites = await Palpite.find({ user: user._id })
-			mapPalpites[user._id] = palpites
-			user = await autalizarTotalAcumulado(user, partidas, palpites)
+			mapPalpites[user._id] = autalizarTotalAcumulado(partidas, palpites)
 		})
 
 		// Atualizado a classificação dos usuários
 		await asyncForEach(partidas, async partida => {
-			let palpites = users.map(user => findPalpite(mapPalpites[user._id], partida))
-			palpites = await classificarPalpites(palpites)
+			if (partida.placarTimeA >= 0 && partida.placarTimeB >= 0) {
+				let palpites = users.map(user => findPalpite(mapPalpites[user._id], partida))
+				palpites = await classificarPalpites(palpites)
+			}
 		})
 
 		// Atualizado os dados dos usuários
 		await asyncForEach(users, async user => {
-			const palpites = mapPalpites[user._id]
-			if (palpites.length > 0) {
-				const palpite = palpites[palpites.length - 1]
-				user = await User.findByIdAndUpdate(user._id, { classificacao: palpite.classificacao }, { new: true })
+			if (mapPalpites[user._id]) {
+				let classificacao = null
+				let totalAcumulado = null
+				const palpites = mapPalpites[user._id]
+				for (let i = palpites.length - 1; i >= 0; i--) {
+					const palpite = palpites[i];
+					if (palpite.totalAcumulado >= 0 && palpite.classificacao >= 0) {
+						classificacao = palpite.classificacao
+						totalAcumulado = palpite.totalAcumulado
+						break
+					}
+				}
+				if (classificacao !== null && totalAcumulado !== null) {
+					user = await User.findByIdAndUpdate(user._id, { classificacao, totalAcumulado }, { new: true })
+				}
 			}
 		})
 
@@ -84,50 +96,43 @@ router.delete('/:id', (req, res, next) => {
 })
 
 const findPalpite = (palpites, partida) => {
-	const palpite = palpites.find(palpite => {
+	return palpites.find(palpite => {
 		return palpite.partida.fase === partida.fase &&
 			palpite.partida.grupo === partida.grupo &&
 			palpite.partida.rodada === partida.rodada &&
 			palpite.partida.timeA.nome === partida.timeA.nome &&
 			palpite.partida.timeB.nome === partida.timeB.nome
 	})
-	return palpite
 }
 
-const autalizarTotalAcumulado = async (user, partidas, palpites) => {
-	user.totalAcumulado = 0
+const autalizarTotalAcumulado = (partidas, palpites) => {
+	let totalAcumulado = 0
 	partidas.forEach(partida => {
-		if (partida.placarTimeA >= 0 && partida.placarTimeB >= 0 && palpites) {
+		if (partida.placarTimeA >= 0 && partida.placarTimeB >= 0) {
 			let palpite = findPalpite(palpites, partida)
 			if (palpite != null) {
 				palpite = calcularPontuacaoPalpite(palpite, partida)
-				user.totalAcumulado += palpite.totalPontosObitidos
-				palpite.totalAcumulado = user.totalAcumulado
+				totalAcumulado += palpite.totalPontosObitidos
+				palpite.totalAcumulado = totalAcumulado
 			}
 		}
 	})
-	return await User.findByIdAndUpdate(user._id, { totalAcumulado: user.totalAcumulado }, { new: true })
+	return palpites
 }
 
 const classificarPalpites = async (palpites) => {
 	let cla = 1
-	let mesmoplacar = 0
-	console.log('Palpite', palpites.length)
+	let mesmoplacar = 1
 	palpites = palpites.filter(palpite => palpite)
-	console.log('Palpite filter', palpites.length)
 	palpites = palpites.sort((p1, p2) => p1.totalAcumulado < p2.totalAcumulado)
-	console.log('Palpite sort', palpites.length)
 	for (let i = 0; i < palpites.length; i++) {
-		console.log('Palpite', palpites[i].totalAcumulado)
 		if (i > 0) {
 			if (palpites[i].totalAcumulado === palpites[i - 1].totalAcumulado) {
 				cla = palpites[i - 1].classificacao
 				mesmoplacar += 1
-				console.log('Palpite mesma classificacao anterior', cla)
 			} else {
 				cla = cla + mesmoplacar
 				mesmoplacar = 1
-				console.log('Palpite com classificacao diferente da anteriro', cla)
 			}
 		}
 		palpites[i].classificacao = cla
@@ -137,22 +142,30 @@ const classificarPalpites = async (palpites) => {
 }
 
 const calcularPontuacaoPalpite = (palpite, partida) => {
-	const palpiteTimeVencedor = palpite.placarTimeA > palpite.placarTimeB ? 'A' : palpite.placarTimeB > palpite.placarTimeA ? 'B' : 'E'
-	const partidaTimeVencedor = partida.placarTimeA > partida.placarTimeB ? 'A' : partida.placarTimeB > partida.placarTimeA ? 'B' : 'E'
-	if (palpite.placarTimeA === partida.placarTimeA && palpite.placarTimeB === partida.placarTimeB) {
-		palpite.totalPontosObitidos = 5
-		palpite.placarCheio = true
-	} else if (palpiteTimeVencedor === partidaTimeVencedor && palpite.placarTimeA >= 0 && palpite.placarTimeB >= 0) {
-		if (palpite.placarTimeA === partida.placarTimeA || palpite.placarTimeB === partida.placarTimeB) {
-			palpite.totalPontosObitidos = 3
-			palpite.placarTimeVencedorComGol = true
+	if (palpite.placarTimeA >= 0 && palpite.placarTimeB >= 0) {
+		const palpiteTimeVencedor = palpite.placarTimeA > palpite.placarTimeB ? 'A' : palpite.placarTimeB > palpite.placarTimeA ? 'B' : 'E'
+		const partidaTimeVencedor = partida.placarTimeA > partida.placarTimeB ? 'A' : partida.placarTimeB > partida.placarTimeA ? 'B' : 'E'
+		if (palpite.placarTimeA === partida.placarTimeA && palpite.placarTimeB === partida.placarTimeB) {
+			palpite.totalPontosObitidos = 5
+			palpite.placarCheio = true
+		} else if (palpiteTimeVencedor === partidaTimeVencedor) {
+			if (palpite.placarTimeA === partida.placarTimeA || palpite.placarTimeB === partida.placarTimeB) {
+				palpite.totalPontosObitidos = 3
+				palpite.placarTimeVencedorComGol = true
+			} else {
+				palpite.totalPontosObitidos = 2
+				palpite.placarTimeVencedor = true
+			}
+		} else if (palpite.placarTimeA === partida.placarTimeA || palpite.placarTimeB === partida.placarTimeB) {
+			palpite.totalPontosObitidos = 1
+			palpite.placarGol = true
 		} else {
-			palpite.totalPontosObitidos = 2
-			palpite.placarTimeVencedor = true
+			palpite.totalPontosObitidos = 0
+			palpite.placarCheio = false
+			palpite.placarTimeVencedorComGol = false
+			palpite.placarTimeVencedor = false
+			palpite.placarGol = false
 		}
-	} else if (palpite.placarTimeA === partida.placarTimeA || palpite.placarTimeB === partida.placarTimeB) {
-		palpite.totalPontosObitidos = 1
-		palpite.placarGol = true
 	}
 	return palpite
 }
