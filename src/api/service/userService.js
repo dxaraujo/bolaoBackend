@@ -41,11 +41,11 @@ router.delete('/:id', (req, res, next) => {
 			console.log('Apagando palpite', palpite._id)
 			console.log(`placarTimeA: ${palpite.placarTimeA}, placarTimeB: ${palpite.placarTimeB}`)
 			const p = await Palpite.findByIdAndRemove(palpite._id)
-			console.log('Palpite apagado', p)
+			console.log('Palpite apagado', p._id)
 		}
 		console.log('Apagando usuário', user._id)
 		const data = await User.findByIdAndRemove(user._id)
-		console.log('Usuário apagado', u)
+		console.log('Usuário apagado', data._id)
 		respondOrErr(res, next, 500, err, 200, { data })
 	}).catch(err => {
 		respondErr(next, 500, err)
