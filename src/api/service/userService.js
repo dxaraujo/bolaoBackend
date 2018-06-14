@@ -1,5 +1,4 @@
 const express = require('express')
-const co = require('co')
 const User = require('../model/user')
 const Palpite = require('../model/palpite')
 const { respondOrErr, respondErr, respondSuccess, handlerError } = require('../../util/serviceUtils')
@@ -33,8 +32,23 @@ router.put('/:id', (req, res, next) => {
 })
 
 router.delete('/:id', (req, res, next) => {
-	User.findByIdAndRemove(req.params.id, req.body, (err, data) => {
-		respondOrErr(res, next, 500, err, 200, { data })
+	User.findById(req.params.id).then(async user => {
+		console.log('Achou usuário', user)
+		const palpites = await Palpite.find({ user: user._id })
+		console.log('Achou palpites', palpites.length)
+		for (let i = 0; i < palpites.length; i++) {
+			const palpite = palpites[i];
+			console.log('Apagando palpite', palpite._id)
+			console.log(`placarTimeA: ${palpite.placarTimeA}, placarTimeB: ${palpite.placarTimeB}`)
+			palpite = await Palpite.findByIdAndRemove(palpite._id)
+			console.log('Palpite apagado')
+		}
+		console.log('Apagando usuário', user._id)
+		user = await User.findByIdAndRemove(user._id)
+		console.log('Usuário apagado')
+		respondOrErr(res, next, 500, err, 200, { data: user })
+	}).catch(err => {
+		respondErr(next, 500, err)
 	})
 })
 

@@ -1,6 +1,4 @@
 const express = require('express')
-const co = require('co')
-const moment = require('moment')
 const Partida = require('../model/partida')
 const Palpite = require('../model/palpite')
 const User = require('../model/user')
