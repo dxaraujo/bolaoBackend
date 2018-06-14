@@ -115,13 +115,16 @@ const classificarPalpites = async (palpites) => {
 	palpites = palpites.filter(palpite => palpite && palpite.totalAcumulado)
 	palpites = palpites.sort((p1, p2) => p1.totalAcumulado < p2.totalAcumulado)
 	for (let i = 0; i < palpites.length; i++) {
+		console.log('Palpite', palpite.totalAcumulado)
 		if (i > 0) {
 			if (palpites[i].totalAcumulado === palpites[i - 1].totalAcumulado) {
 				cla = palpites[i - 1].classificacao
-				++mesmoplacar
+				mesmoplacar += 1
+				console.log('Palpite mesma classificacao anterior', cla)
 			} else {
-				cla += mesmoplacar
+				cla = clas + mesmoplacar
 				mesmoplacar = 1
+				console.log('Palpite com classificacao diferente da anteriro', cla)
 			}
 		}
 		palpites[i].classificacao = cla
