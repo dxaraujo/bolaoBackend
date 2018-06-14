@@ -47,9 +47,9 @@ router.delete('/:id', (req, res, next) => {
 			console.log('Apagando usuário', user._id)
 			const data = await User.findByIdAndRemove(user._id)
 			console.log('Usuário apagado', data._id)
-			respondOrErr(res, next, 500, err, 200, { data })
+			respondSuccess(res, 200, { data })
 		}
-		respondOrErr(res, next, 500, err, 200, { data: 'Usuário não encontrado' })
+		respondSuccess(res, 200, { data: 'Usuário não encontrado' })
 	}).catch(err => {
 		respondErr(next, 500, err)
 	})
