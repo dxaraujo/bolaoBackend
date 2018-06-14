@@ -117,6 +117,8 @@ const classificarPalpites = async (partida, palpites) => {
 }
 
 const calcularPontuacaoPalpite = (palpite, partida) => {
+	console.log('Palpite', palpite)
+	console.log('Partida', partida)
 	const palpiteTimeVencedor = palpite.placarTimeA > palpite.placarTimeB ? 'A' : palpite.placarTimeB > palpite.placarTimeA ? 'B' : 'E'
 	const partidaTimeVencedor = partida.placarTimeA > partida.placarTimeB ? 'A' : partida.placarTimeB > partida.placarTimeA ? 'B' : 'E'
 	if (palpite.placarTimeA === partida.placarTimeA && palpite.placarTimeB === partida.placarTimeB) {
