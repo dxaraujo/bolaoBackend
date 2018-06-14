@@ -44,7 +44,7 @@ router.delete('/:id', (req, res, next) => {
 			console.log('Palpite apagado')
 		}
 		console.log('Apagando usuário', user._id)
-		user = await User.findByIdAndRemove(user._id)
+		user = await User.findByIdAndRemove(user._id, { select: true })
 		console.log('Usuário apagado')
 		respondOrErr(res, next, 500, err, 200, { data: user })
 	}).catch(err => {
