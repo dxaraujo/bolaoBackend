@@ -114,8 +114,11 @@ const autalizarTotalAcumulado = async (user, partidas, palpites) => {
 const classificarPalpites = async (palpites) => {
 	let cla = 1
 	let mesmoplacar = 0
-	palpites = palpites.filter(palpite => palpite ? palpite.totalAcumulado ? true : false : false)
+	console.log('Palpite', palpite.length)
+	palpites = palpites.filter(palpite => palpite)
+	console.log('Palpite filter', palpite.length)
 	palpites = palpites.sort((p1, p2) => p1.totalAcumulado < p2.totalAcumulado)
+	console.log('Palpite sort', palpite.length)
 	for (let i = 0; i < palpites.length; i++) {
 		console.log('Palpite', palpite.totalAcumulado)
 		if (i > 0) {
