@@ -95,7 +95,7 @@ const findPalpite = (palpites, partida) => {
 const autalizarTotalAcumulado = async (user, partidas, palpites) => {
 	user.totalAcumulado = 0
 	partidas.forEach(partida => {
-		if (partida.placarTimeA >= 0 && partida.placarTimeB >= 0) {
+		if (partida && partida.placarTimeA >= 0 && partida.placarTimeB >= 0) {
 			let palpite = findPalpite(palpites, partida)
 			palpite = calcularPontuacaoPalpite(palpite, partida)
 			user.totalAcumulado += palpite.totalPontosObitidos
@@ -106,7 +106,7 @@ const autalizarTotalAcumulado = async (user, partidas, palpites) => {
 }
 
 const classificarPalpites = async (partida, palpites) => {
-	if (partida.placarTimeA >= 0 && partida.placarTimeB >= 0) {
+	if (partida && partida.placarTimeA >= 0 && partida.placarTimeB >= 0) {
 		palpites = palpites.sort((p1, p2) => p1.totalAcumulado < p2.totalAcumulado)
 		for (let i = 0; i < palpites.length; i++) {
 			palpites[i].classificacao = i + 1
