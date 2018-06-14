@@ -33,20 +33,23 @@ router.put('/:id', (req, res, next) => {
 
 router.delete('/:id', (req, res, next) => {
 	User.findById(req.params.id).then(async user => {
-		console.log('Achou usuário', user)
-		const palpites = await Palpite.find({ user: user._id })
-		console.log('Achou palpites', palpites.length)
-		for (let i = 0; i < palpites.length; i++) {
-			const palpite = palpites[i];
-			console.log('Apagando palpite', palpite._id)
-			console.log(`placarTimeA: ${palpite.placarTimeA}, placarTimeB: ${palpite.placarTimeB}`)
-			const p = await Palpite.findByIdAndRemove(palpite._id)
-			console.log('Palpite apagado', p._id)
+		if (user) {
+			console.log('Achou usuário', user)
+			const palpites = await Palpite.find({ user: user._id })
+			console.log('Achou palpites', palpites.length)
+			for (let i = 0; i < palpites.length; i++) {
+				const palpite = palpites[i];
+				console.log('Apagando palpite', palpite._id)
+				console.log(`placarTimeA: ${palpite.placarTimeA}, placarTimeB: ${palpite.placarTimeB}`)
+				const p = await Palpite.findByIdAndRemove(palpite._id)
+				console.log('Palpite apagado', p._id)
+			}
+			console.log('Apagando usuário', user._id)
+			const data = await User.findByIdAndRemove(user._id)
+			console.log('Usuário apagado', data._id)
+			respondOrErr(res, next, 500, err, 200, { data })
 		}
-		console.log('Apagando usuário', user._id)
-		const data = await User.findByIdAndRemove(user._id)
-		console.log('Usuário apagado', data._id)
-		respondOrErr(res, next, 500, err, 200, { data })
+		respondOrErr(res, next, 500, err, 200, { data: 'Usuário não encontrado' })
 	}).catch(err => {
 		respondErr(next, 500, err)
 	})
