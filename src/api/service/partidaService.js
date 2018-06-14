@@ -121,6 +121,7 @@ const classificarPalpites = async (palpites) => {
 				++mesmoplacar
 			} else {
 				cla += mesmoplacar
+				mesmoplacar = 1
 			}
 		}
 		palpites[i].classificacao = cla
