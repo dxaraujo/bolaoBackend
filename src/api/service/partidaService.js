@@ -52,8 +52,10 @@ router.put('/:id/updateResultado', async (req, res, next) => {
 
 		// Atualizado a classificação dos usuários
 		await asyncForEach(partidas, async partida => {
-			let palpites = users.map(user => findPalpite(mapPalpites[user._id], partida))
-			palpites = await classificarPalpites(palpites)
+			if (partida.placarTimeA >= 0 && partida.placarTimeB >= 0) {
+				let palpites = users.map(user => findPalpite(mapPalpites[user._id], partida))
+				palpites = await classificarPalpites(palpites)
+			}
 		})
 
 		// Atualizado os dados dos usuários
@@ -112,7 +114,7 @@ const autalizarTotalAcumulado = async (user, partidas, palpites) => {
 const classificarPalpites = async (palpites) => {
 	let cla = 1
 	let mesmoplacar = 0
-	palpites = palpites.filter(palpite => palpite && palpite.totalAcumulado ? palpite : null)
+	palpites = palpites.filter(palpite => palpite ? palpite.totalAcumulado ? true : false : false)
 	palpites = palpites.sort((p1, p2) => p1.totalAcumulado < p2.totalAcumulado)
 	for (let i = 0; i < palpites.length; i++) {
 		console.log('Palpite', palpite.totalAcumulado)
