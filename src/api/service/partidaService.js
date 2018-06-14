@@ -52,10 +52,8 @@ router.put('/:id/updateResultado', async (req, res, next) => {
 
 		// Atualizado a classificação dos usuários
 		await asyncForEach(partidas, async partida => {
-			if (partida.placarTimeA >= 0 && partida.placarTimeB >= 0) {
-				let palpites = users.map(user => findPalpite(mapPalpites[user._id], partida))
-				palpites = await classificarPalpites(palpites)
-			}
+			let palpites = users.map(user => findPalpite(mapPalpites[user._id], partida))
+			palpites = await classificarPalpites(palpites)
 		})
 
 		// Atualizado os dados dos usuários
