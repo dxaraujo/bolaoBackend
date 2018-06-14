@@ -59,8 +59,10 @@ router.put('/:id/updateResultado', async (req, res, next) => {
 		// Atualizado os dados dos usuários
 		await asyncForEach(users, async user => {
 			const palpites = mapPalpites[user._id]
-			const palpite = palpites[palpites.length - 1]
-			user = await User.findByIdAndUpdate(user._id, { classificacao: palpite.classificacao }, { new: true })
+			if (palpites.length > 0) {
+				const palpite = palpites[palpites.length - 1]
+				user = await User.findByIdAndUpdate(user._id, { classificacao: palpite.classificacao }, { new: true })
+			}
 		})
 
 		respondSuccess(res, 200, { data: newPartida })
@@ -95,7 +97,7 @@ const findPalpite = (palpites, partida) => {
 const autalizarTotalAcumulado = async (user, partidas, palpites) => {
 	user.totalAcumulado = 0
 	partidas.forEach(partida => {
-		if (partida && partida.placarTimeA >= 0 && partida.placarTimeB >= 0) {
+		if (partida.placarTimeA >= 0 && partida.placarTimeB >= 0 && palpite) {
 			let palpite = findPalpite(palpites, partida)
 			palpite = calcularPontuacaoPalpite(palpite, partida)
 			user.totalAcumulado += palpite.totalPontosObitidos
@@ -106,18 +108,19 @@ const autalizarTotalAcumulado = async (user, partidas, palpites) => {
 }
 
 const classificarPalpites = async (partida, palpites) => {
-	if (partida && partida.placarTimeA >= 0 && partida.placarTimeB >= 0) {
+	if (partida.placarTimeA >= 0 && partida.placarTimeB >= 0) {
 		palpites = palpites.sort((p1, p2) => p1.totalAcumulado < p2.totalAcumulado)
 		for (let i = 0; i < palpites.length; i++) {
-			palpites[i].classificacao = i + 1
-			palpites[i] = await Palpite.findByIdAndUpdate(palpites[i]._id, palpites[i], { new: true })
+			if (palpites[i]) {
+				palpites[i].classificacao = i + 1
+				palpites[i] = await Palpite.findByIdAndUpdate(palpites[i]._id, palpites[i], { new: true })
+			}
 		}
 	}
 	return palpites
 }
 
 const calcularPontuacaoPalpite = (palpite, partida) => {
-	console.log('Iniciando calculo do Palpite')
 	const palpiteTimeVencedor = palpite.placarTimeA > palpite.placarTimeB ? 'A' : palpite.placarTimeB > palpite.placarTimeA ? 'B' : 'E'
 	const partidaTimeVencedor = partida.placarTimeA > partida.placarTimeB ? 'A' : partida.placarTimeB > partida.placarTimeA ? 'B' : 'E'
 	if (palpite.placarTimeA === partida.placarTimeA && palpite.placarTimeB === partida.placarTimeB) {
@@ -135,7 +138,6 @@ const calcularPontuacaoPalpite = (palpite, partida) => {
 		palpite.totalPontosObitidos = 1
 		palpite.placarGol = true
 	}
-	console.log('Finazilando calculo do Palpite')
 	return palpite
 }
 
