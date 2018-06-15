@@ -8,7 +8,7 @@ const router = express.Router()
 
 router.get('/', async (req, res, next) => {
 	User.find(req.query).sort({ totalAcumulado: 'desc' }).then(async users => {
-		const fases = Fase.find({status: 'B'})
+		const fases = Fase.find({ status: 'B' })
 		for (let i = 0; i < users.length; i++) {
 			users[i] = {
 				_id: users[i]._id,
@@ -20,18 +20,18 @@ router.get('/', async (req, res, next) => {
 				classificacao: users[i].classificacao,
 				isAdmin: users[i].isAdmin
 			}
-			 let palpites = await Palpite.find({ user: users[i]._id }).sort({ 'partida.data': 'asc' })
-			 palpites = palpites.filter(palpite => {
-				 let result = false
-				 for (let j = 0; j < fases.length; j++) {
-					 if (fases[j].nome === palpite.partida.fase) {
-						 result = true
-						 break
-					 }
-				 }
-				 return result
-			 })
-			 users[i].palpites = palpites
+			let palpites = await Palpite.find({ user: users[i]._id }).sort({ 'partida.data': 'asc' })
+			palpites = palpites.filter(palpite => {
+				let result = false
+				for (let j = 0; j < fases.length; j++) {
+					if (fases[j].nome.equals(palpite.partida.fase)) {
+						result = true
+						break
+					}
+				}
+				return result
+			})
+			users[i].palpites = palpites
 		}
 		respondSuccess(res, 200, { data: users })
 	}).catch(err => {
