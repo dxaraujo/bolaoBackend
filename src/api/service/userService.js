@@ -9,6 +9,7 @@ const router = express.Router()
 router.get('/', async (req, res, next) => {
 	User.find(req.query).sort({ totalAcumulado: 'desc' }).then(async users => {
 		const fases = Fase.find({ status: 'B' })
+		console.log(fases)
 		for (let i = 0; i < users.length; i++) {
 			users[i] = {
 				_id: users[i]._id,
@@ -24,8 +25,10 @@ router.get('/', async (req, res, next) => {
 			palpites = palpites.filter(palpite => {
 				let result = false
 				for (let j = 0; j < fases.length; j++) {
+					console.log(`Fase: ${fases[j].nome} - Partida: ${palpite.partida.fase}`)
 					if (fases[j].nome.equals(palpite.partida.fase)) {
 						result = true
+						console.log('Igual Obbbba')
 						break
 					}
 				}
