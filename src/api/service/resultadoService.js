@@ -1,5 +1,6 @@
 const express = require('express')
 const moment = require('moment')
+const Partida = require('../model/partida')
 const { JSDOM } = require('jsdom')
 const { respondErr, respondSuccess, handlerError } = require('../../util/serviceUtils')
 
