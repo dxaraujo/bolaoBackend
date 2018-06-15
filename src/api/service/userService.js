@@ -8,7 +8,7 @@ const router = express.Router()
 
 router.get('/', async (req, res, next) => {
 	User.find(req.query).sort({ totalAcumulado: 'desc' }).then(async users => {
-		const fases = Fase.find({ status: 'B' })
+		const fases = await Fase.find({ status: 'B' })
 		console.log(fases)
 		for (let i = 0; i < users.length; i++) {
 			users[i] = {
