@@ -7,10 +7,13 @@ const router = express.Router()
 
 router.get('/', (req, res, next) => {
 	try {
-		const partidas = await Partida.find({ data: { $lt: moment.utc(new Date()).add(3, 'hours').toDate() } }).sort({ data: 'asc' })
 		JSDOM.fromURL('https://globoesporte.globo.com/placar-ge/hoje/jogos.ghtml').then(async dom => {
+
 			const document = dom.window.document
 			const jogos = document.getElementsByClassName('card-jogo')
+
+			const partidas = await Partida.find({ data: { $lt: moment.utc(new Date()).add(3, 'hours').toDate() } }).sort({ data: 'asc' })
+
 			for (let i = 0; i < jogos.length; i++) {
 				const nomeJogo = jogos.item(i).getElementsByClassName('titulo').item(0).firstElementChild.innerHTML
 				const dataHoraJogo = jogos.item(i).getElementsByClassName('titulo').item(0).getElementsByClassName('hora-local').item(0).getAttribute('content')
@@ -26,7 +29,7 @@ router.get('/', (req, res, next) => {
 					console.log(dataHoraJogo)
 					console.log(nomeTimeA)
 					console.log(nomeTimeB)
-					partidas.forEach(partida => {
+					partidas.forEach(async partida => {
 						if (partida.timeA.nome == nomeTimeA &&
 							partida.timeB.nome == nomeTimeB &&
 							moment(partida.data).isSame(moment(dataHoraJogo, 'YYYY-MM-DDThh:mm:ss'))) {
