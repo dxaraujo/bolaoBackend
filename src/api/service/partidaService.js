@@ -124,7 +124,7 @@ const classificarPalpites = async (palpites) => {
 	let cla = 1
 	let mesmoplacar = 1
 	palpites = palpites.filter(palpite => palpite)
-	palpites = palpites.sort((p1, p2) => p1.totalAcumulado < p2.totalAcumulado)
+	palpites = palpites.sort((p1, p2) => p2.totalAcumulado - p1.totalAcumulado)
 	for (let i = 0; i < palpites.length; i++) {
 		if (i > 0) {
 			if (palpites[i].totalAcumulado === palpites[i - 1].totalAcumulado) {
