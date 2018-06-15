@@ -38,6 +38,6 @@ const userSchema = new mongoose.Schema({
 		required: true,
 		default: false
 	}
-})
+}, { strict: false })
 
 module.exports = mongoose.model('user', userSchema)

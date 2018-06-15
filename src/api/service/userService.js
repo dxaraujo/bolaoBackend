@@ -1,13 +1,39 @@
 const express = require('express')
 const User = require('../model/user')
+const Fase = require('../model/fase')
 const Palpite = require('../model/palpite')
-const { respondOrErr, respondErr, respondSuccess, handlerError } = require('../../util/serviceUtils')
+const { respondOrErr, respondErr, respondSuccess, handlerError, asyncForEach } = require('../../util/serviceUtils')
 
 const router = express.Router()
 
 router.get('/', async (req, res, next) => {
-	User.find(req.query).sort({ totalAcumulado: 'desc' }).then(data => {
-		respondSuccess(res, 200, { data })
+	User.find(req.query).sort({ totalAcumulado: 'desc' }).then(async users => {
+		const fases = Fase.find({status: 'B'})
+		for (let i = 0; i < users.length; i++) {
+			users[i] = {
+				_id: users[i]._id,
+				name: users[i].name,
+				username: users[i].username,
+				avatar: users[i].avatar,
+				facebookId: users[i].facebookId,
+				totalAcumulado: users[i].totalAcumulado,
+				classificacao: users[i].classificacao,
+				isAdmin: users[i].isAdmin
+			}
+			 let palpites = await Palpite.find({ user: users[i]._id }).sort({ 'partida.data': 'asc' })
+			 palpites = palpites.filter(palpite => {
+				 let result = false
+				 for (let j = 0; j < fases.length; j++) {
+					 if (fases[j].nome === palpite.partida.fase) {
+						 result = true
+						 break
+					 }
+				 }
+				 return result
+			 })
+			 users[i].palpites = palpites
+		}
+		respondSuccess(res, 200, { data: users })
 	}).catch(err => {
 		respondErr(next, 500, err)
 	});
