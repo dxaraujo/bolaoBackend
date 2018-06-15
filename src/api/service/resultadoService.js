@@ -41,9 +41,9 @@ router.get('/', (req, res, next) => {
 							partida = await Partida.findByIdAndUpdate(partida._id, { placarTimeA, placarTimeB }, { new: true })
 						}
 					});
-					respondSuccess(res, 200, { data: 'Só sucesso' })
 				}
 			}
+			respondSuccess(res, 200, { data: 'Só sucesso' })
 		})
 	} catch (err) {
 		respondErr(next, 500, err)
