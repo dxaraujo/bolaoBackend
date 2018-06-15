@@ -2,6 +2,7 @@ const express = require('express')
 const Partida = require('../model/partida')
 const Palpite = require('../model/palpite')
 const User = require('../model/user')
+const moment = require('moment')
 const { respondOrErr, respondSuccess, respondErr, handlerError, asyncForEach } = require('../../util/serviceUtils')
 
 const router = express.Router()
@@ -16,7 +17,7 @@ router.get('/', (req, res, next) => {
 
 router.get('/resultado', async (req, res, next) => {
 	try {
-		const partidas = await Partida.find({ data: { $lt: new Date() } }).sort({ data: 'asc' })
+		const partidas = await Partida.find({ data: { $lt: moment.utc(new Date()).toDate() } }).sort({ data: 'asc' })
 		respondSuccess(res, 200, { data: partidas })
 	} catch (err) {
 		respondErr(next, 500, err)
