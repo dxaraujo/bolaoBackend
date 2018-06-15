@@ -26,7 +26,7 @@ router.get('/', async (req, res, next) => {
 				let result = false
 				for (let j = 0; j < fases.length; j++) {
 					console.log(`Fase: ${fases[j].nome} - Partida: ${palpite.partida.fase}`)
-					if (fases[j].nome.equals(palpite.partida.fase)) {
+					if (fases[j].nome == palpite.partida.fase) {
 						result = true
 						console.log('Igual Obbbba')
 						break
