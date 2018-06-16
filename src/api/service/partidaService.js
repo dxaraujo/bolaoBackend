@@ -149,16 +149,28 @@ const calcularPontuacaoPalpite = (palpite, partida) => {
 		if (palpite.placarTimeA === partida.placarTimeA && palpite.placarTimeB === partida.placarTimeB) {
 			palpite.totalPontosObitidos = 5
 			palpite.placarCheio = true
+			palpite.placarTimeVencedorComGol = false
+			palpite.placarTimeVencedor = false
+			palpite.placarGol = false
 		} else if (palpiteTimeVencedor === partidaTimeVencedor) {
 			if (palpite.placarTimeA === partida.placarTimeA || palpite.placarTimeB === partida.placarTimeB) {
 				palpite.totalPontosObitidos = 3
+				palpite.placarCheio = false
 				palpite.placarTimeVencedorComGol = true
+				palpite.placarTimeVencedor = false
+				palpite.placarGol = false
 			} else {
 				palpite.totalPontosObitidos = 2
+				palpite.placarCheio = false
+				palpite.placarTimeVencedorComGol = false
 				palpite.placarTimeVencedor = true
+				palpite.placarGol = false
 			}
 		} else if (palpite.placarTimeA === partida.placarTimeA || palpite.placarTimeB === partida.placarTimeB) {
 			palpite.totalPontosObitidos = 1
+			palpite.placarCheio = false
+			palpite.placarTimeVencedorComGol = false
+			palpite.placarTimeVencedor = false
 			palpite.placarGol = true
 		} else {
 			palpite.totalPontosObitidos = 0
