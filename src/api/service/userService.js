@@ -9,19 +9,19 @@ const router = express.Router()
 router.get('/', async (req, res, next) => {
 	User.find(req.query).then(async users => {
 		const fases = await Fase.find({ status: 'B' })
-		const allPalpites = await Palpite.find({}).sort({ 'partida.order': 'asc' })
 		for (let i = 0; i < users.length; i++) {
-			const user = users[i]
-			const palpites = allPalpites.filter(palpite => palpite.user.valueOf() === user._id.valueOf()).filter(palpite => {
+			let palpites = await Palpite.find({ user: users[i]._id }).sort({ 'partida.order': 'asc' })
+			palpites = palpites.filter(palpite => {
 				let result = false
 				for (let j = 0; j < fases.length; j++) {
-					if (fases[j].nome == palpite.partida.fase) {
+					if (fases[j].nome === palpite.partida.fase) {
 						result = true
 						break
 					}
 				}
 				return result
 			})
+			console.log()
 			users[i].set('palpites', palpites)
 		}
 		respondSuccess(res, 200, { data: users })
