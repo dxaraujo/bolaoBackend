@@ -12,7 +12,7 @@ router.get('/', async (req, res, next) => {
 		const allPalpites = await Palpite.find({}).sort({ 'partida.order': 'asc' })
 		for (let i = 0; i < users.length; i++) {
 			const user = users[i]
-			const palpites = allPalpites.filter(palpite => palpite.user === user._id).filter(palpite => {
+			const palpites = allPalpites.filter(palpite => palpite.user == user._id).filter(palpite => {
 				let result = false
 				for (let j = 0; j < fases.length; j++) {
 					if (fases[j].nome == palpite.partida.fase) {
