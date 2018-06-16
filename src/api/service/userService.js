@@ -21,7 +21,6 @@ router.get('/', async (req, res, next) => {
 				}
 				return result
 			})
-			console.log()
 			users[i].set('palpites', palpites)
 		}
 		respondSuccess(res, 200, { data: users })
