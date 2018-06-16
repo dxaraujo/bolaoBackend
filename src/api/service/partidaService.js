@@ -8,7 +8,7 @@ const { respondOrErr, respondSuccess, respondErr, handlerError, asyncForEach } =
 const router = express.Router()
 
 router.get('/', (req, res, next) => {
-	Partida.find(req.query).sort({ 'data': 'asc' }).then(partidas => {
+	Partida.find(req.query).sort({ order: 'asc' }).then(partidas => {
 		respondSuccess(res, 200, { data: partidas })
 	}).catch(err => {
 		respondErr(next, 500, err)
@@ -16,12 +16,12 @@ router.get('/', (req, res, next) => {
 })
 
 router.get('/resultado', async (req, res, next) => {
-	try {
-		const partidas = await Partida.find({ data: { $lt: moment.utc(new Date()).toDate() } }).sort({ data: 'asc' })
+	const date = moment().subtract(3, 'hours').toDate()
+	Partida.find({ data: { $lt: date } }).sort({ order: 'asc' }).then(partidas => {
 		respondSuccess(res, 200, { data: partidas })
-	} catch (err) {
+	}).catch(err => {
 		respondErr(next, 500, err)
-	}
+	})
 })
 
 router.get('/:id', (req, res, next) => {
@@ -40,13 +40,13 @@ router.put('/:id/updateResultado', async (req, res, next) => {
 	try {
 
 		const newPartida = await Partida.findByIdAndUpdate(req.params.id, req.body, { new: true })
-		const partidas = await Partida.find({}).sort({ 'data': 'asc' })
+		const partidas = await Partida.find({}).sort({ order: 'asc' })
 		const users = await User.find({})
 		let mapPalpites = []
 
 		// Atualizado o total de ponto acumulados
 		await asyncForEach(users, async user => {
-			let palpites = await Palpite.find({ user: user._id })
+			let palpites = await Palpite.find({ user: user._id }).sort({ 'partida.order': 'asc' })
 			mapPalpites[user._id] = autalizarTotalAcumulado(partidas, palpites)
 		})
 

@@ -2,27 +2,17 @@ const express = require('express')
 const User = require('../model/user')
 const Fase = require('../model/fase')
 const Palpite = require('../model/palpite')
-const { respondOrErr, respondErr, respondSuccess, handlerError, asyncForEach } = require('../../util/serviceUtils')
+const { respondOrErr, respondErr, respondSuccess, handlerError } = require('../../util/serviceUtils')
 
 const router = express.Router()
 
 router.get('/', async (req, res, next) => {
-	User.find(req.query).sort({ totalAcumulado: 'desc' }).then(async users => {
+	User.find(req.query).then(async users => {
 		const fases = await Fase.find({ status: 'B' })
-		console.log(fases)
+		const allPalpites = await Palpite.find({}).sort({ 'partida.order': 'asc' })
 		for (let i = 0; i < users.length; i++) {
-			users[i] = {
-				_id: users[i]._id,
-				name: users[i].name,
-				username: users[i].username,
-				avatar: users[i].avatar,
-				facebookId: users[i].facebookId,
-				totalAcumulado: users[i].totalAcumulado,
-				classificacao: users[i].classificacao,
-				isAdmin: users[i].isAdmin
-			}
-			let palpites = await Palpite.find({ user: users[i]._id }).sort({ 'partida.data': 'asc' })
-			palpites = palpites.filter(palpite => {
+			const user = users[i]
+			const palpites = allPalpites.filter(palpite => palpite.user = user._id).filter(palpite => {
 				let result = false
 				for (let j = 0; j < fases.length; j++) {
 					if (fases[j].nome == palpite.partida.fase) {
@@ -32,7 +22,7 @@ router.get('/', async (req, res, next) => {
 				}
 				return result
 			})
-			users[i].palpites = palpites
+			users[i].set('palpites', palpites)
 		}
 		respondSuccess(res, 200, { data: users })
 	}).catch(err => {
@@ -61,22 +51,16 @@ router.put('/:id', (req, res, next) => {
 router.delete('/:id', (req, res, next) => {
 	User.findById(req.params.id).then(async user => {
 		if (user) {
-			console.log('Achou usuário', user)
 			const palpites = await Palpite.find({ user: user._id })
-			console.log('Achou palpites', palpites.length)
 			for (let i = 0; i < palpites.length; i++) {
 				const palpite = palpites[i];
-				console.log('Apagando palpite', palpite._id)
-				console.log(`placarTimeA: ${palpite.placarTimeA}, placarTimeB: ${palpite.placarTimeB}`)
 				const p = await Palpite.findByIdAndRemove(palpite._id)
-				console.log('Palpite apagado', p._id)
 			}
-			console.log('Apagando usuário', user._id)
 			const data = await User.findByIdAndRemove(user._id)
-			console.log('Usuário apagado', data._id)
 			respondSuccess(res, 200, { data })
+		} else {
+			respondSuccess(res, 200, { data: 'Usuário não encontrado' })
 		}
-		respondSuccess(res, 200, { data: 'Usuário não encontrado' })
 	}).catch(err => {
 		respondErr(next, 500, err)
 	})
