@@ -4,11 +4,11 @@ const { JSDOM } = require('jsdom')
 const Partida = require('./api/model/partida')
 const atualizarResultados = require('./api/service/resultadoService')
 
-schedule.scheduleJob('*/5 9-17 * * *', async () => {
+schedule.scheduleJob('*/1 9-17 * * *', async () => {
 	console.log('chegou aqui')
 	try {
 		const dom = await JSDOM.fromURL('https://globoesporte.globo.com/placar-ge/hoje/jogos.ghtml')
-		console.log('o dom deu certo')
+		console.log('O parse do dom funcionou!!!')
 		const date = moment().subtract(3, 'hours').toDate()
 		const partidas = await Partida.find({ data: { $lt: date } }).sort({ order: 'asc' })
 		const doc = dom.window.document;
@@ -28,7 +28,7 @@ schedule.scheduleJob('*/5 9-17 * * *', async () => {
 					const placarTimeB = resultado.getElementsByClassName('placar-visitante').item(0).innerHTML
 					console.log(`Acho jogo com placar ${timeA} ${placarTimeA} x ${placarTimeB} ${timeB}`)
 					if (placarTimeA >= 0 && placarTimeB >= 0) {
-						console.log('procurando partida')
+						console.log('Procurando partida')
 						const partida = partidas.find(partida => {
 							return partida.timeA.nome == timeA &&
 									partida.timeB.nome == timeB &&
@@ -36,12 +36,8 @@ schedule.scheduleJob('*/5 9-17 * * *', async () => {
 						})
 						if (partida != null) {
 							console.log(`Achou partida ${partida.timeA.nome} ${partida.placarTimeA} x ${partida.placarTimeB} ${partida.timeB.nome}`)
-							console.log('Partida placarTimeA: ', partida.placarTimeA)
-							console.log('Partida placarTimeB: ', partida.placarTimeB)
-							console.log('PlacarTimeA: ', placarTimeA)
-							console.log('PlacarTimeB: ', placarTimeB)
 							if (partida.placarTimeA != placarTimeA || partida.placarTimeB != placarTimeB) {
-								console.log('achou partida com placar desatualizado')
+								console.log('Achou partida com placar desatualizado')
 								const newPartida = await atualizarResultados(partida._id, { placarTimeA, placarTimeB })
 								console.log(`Partida: ${newPartida._id} - ${newPartida.timeA.nome} ${newPartida.placarTimeA} x ${newPartida.placarTimeB} ${newPartida.timeB.nome}`)
 							}
