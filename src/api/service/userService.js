@@ -1,4 +1,5 @@
 const express = require('express')
+const moment = require('moment')
 const User = require('../model/user')
 const Fase = require('../model/fase')
 const Palpite = require('../model/palpite')
@@ -10,6 +11,9 @@ router.get('/', async (req, res, next) => {
 	User.find(req.query).then(async users => {
 		const fases = await Fase.find({ status: 'B' })
 		for (let i = 0; i < users.length; i++) {
+			//console.log('###########################################################################')
+			//console.log(`APOSTAS DE ${users[i].name}`)
+			//console.log('###########################################################################')
 			let palpites = await Palpite.find({ user: users[i]._id }).sort({ 'partida.order': 'asc' })
 			palpites = palpites.filter(palpite => {
 				let result = false
@@ -21,6 +25,18 @@ router.get('/', async (req, res, next) => {
 				}
 				return result
 			})
+			//let fase = ''
+			//palpites.forEach(palpite => {
+			//	if (palpite.fase != fase) {
+			//		console.log('---------------------------------------------------------------------------')
+			//		console.log(`${palpite.partida.fase}`)
+			//		console.log('---------------------------------------------------------------------------')
+			//		console.log('Data                 Seleção 1            Placar           Seleção 2')
+			//		fase = palpite.fase
+			//	}
+			//	console.log(`${moment(palpite.partida.data).add(3, 'hours').format('DD/MM/YYYY hh:mm').padEnd(20)} ${palpite.partida.timeA.nome.padEnd(20)} ${palpite.placarTimeA != null ? palpite.placarTimeA : ' '} x ${palpite.placarTimeB != null ? palpite.placarTimeB : ' '}            ${palpite.partida.timeB.nome}`)
+			//})
+			//console.log('')
 			users[i].set('palpites', palpites)
 		}
 		respondSuccess(res, 200, { data: users })
