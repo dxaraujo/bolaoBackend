@@ -4,9 +4,10 @@ const { JSDOM } = require('jsdom')
 const Partida = require('./api/model/partida')
 const atualizarResultados = require('./api/service/resultadoService')
 
-schedule.scheduleJob('*/5 9-17 * * *', () => {
+schedule.scheduleJob('*/5 9-17 * * *', async () => {
 	console.log('chegou aqui')
-	JSDOM.fromURL('https://globoesporte.globo.com/placar-ge/hoje/jogos.ghtml').then(async dom => {
+	try {
+		const dom = await JSDOM.fromURL('https://globoesporte.globo.com/placar-ge/hoje/jogos.ghtml')
 		const date = moment().subtract(3, 'hours').toDate()
 		const partidas = await Partida.find({ data: { $lt: date } }).sort({ order: 'asc' })
 		const doc = dom.window.document;
@@ -45,7 +46,7 @@ schedule.scheduleJob('*/5 9-17 * * *', () => {
 			}
 		}
 		console.log('finalizou a atualização dos resultados')
-	}).catch(err => {
+	} catch(err) {
 		console.log(err)
-	})
+	}
 });
