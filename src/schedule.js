@@ -20,8 +20,8 @@ schedule.scheduleJob('*/5 9-17 * * *', async () => {
 			const horarioJogo = jogo.getElementsByClassName('titulo').item(0).lastElementChild.getAttribute('datetime')
 			if (nomeJogo == 'Copa do Mundo da FIFA™') {
 				console.log(`Acho jogo ${timeA} x ${timeB}`)
-				const timeA = jogo.getElementsByClassName('mandante').item(0).firstElementChild.getAttribute('title')
-				const timeB = jogo.getElementsByClassName('visitante').item(0).lastElementChild.getAttribute('title')
+				const timeA = jogo.getElementsByClassName('mandante').item(0).getElementsByClassName('nome-completo').item(0).innerHTML
+				const timeB = jogo.getElementsByClassName('visitante').item(0).getElementsByClassName('nome-completo').item(0).innerHTML
 				const resultado = jogo.getElementsByClassName('resultado').item(0)
 				if (resultado.childElementCount > 1) {
 					const placarTimeA = resultado.getElementsByClassName('placar-mandante').item(0).innerHTML
