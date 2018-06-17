@@ -28,13 +28,14 @@ schedule.scheduleJob('*/5 9-17 * * *', async () => {
 					const placarTimeB = resultado.getElementsByClassName('placar-visitante').item(0).innerHTML
 					console.log(`Acho jogo com placar ${timeA} ${placarTimeA} x ${placarTimeB} ${timeB}`)
 					if (placarTimeA >= 0 && placarTimeB >= 0) {
+						console.log('procurando partida')
 						const partida = partidas.find(partida => {
 							return partida.timeA.nome == timeA &&
 									partida.timeB.nome == timeB &&
 									moment(partida.data, 'YYYY-MM-DDThh:mm:ss').add(3, 'hours').isSame(moment(horarioJogo, 'YYYY-MM-DDThh:mm:ss'))
 						})
 						if (partida != null) {
-							console.log('achou partida')
+							console.log(`Achou partida ${partida.timeA.nome} ${partida.placarTimeA} x ${partida.placarTimeB} ${partida.timeB.nome}`)
 							console.log('Partida placarTimeA: ', partida.placarTimeA)
 							console.log('Partida placarTimeB: ', partida.placarTimeB)
 							console.log('PlacarTimeA: ', placarTimeA)
