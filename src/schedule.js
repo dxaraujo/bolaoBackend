@@ -31,6 +31,9 @@ schedule.scheduleJob('*/1 9-17 * * *', async () => {
 					console.log(`Acho jogo com placar ${timeA} ${placarTimeA} x ${placarTimeB} ${timeB}`)
 					if (placarTimeA >= 0 && placarTimeB >= 0) {
 						console.log('Procurando partida')
+						console.log('timeA:', partida.timeA.nome == timeA)
+						console.log('timeB:', partida.timeB.nome == timeB)
+						console.log('data:', moment(partida.data, 'YYYY-MM-DDThh:mm:ss').add(3, 'hours').isSame(moment(horarioJogo, 'YYYY-MM-DDThh:mm:ss')))
 						const partida = partidas.find(partida => {
 							return partida.timeA.nome == timeA &&
 									partida.timeB.nome == timeB &&
