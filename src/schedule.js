@@ -10,7 +10,9 @@ schedule.scheduleJob('*/1 9-17 * * *', async () => {
 		const dom = await JSDOM.fromURL('https://globoesporte.globo.com/placar-ge/hoje/jogos.ghtml')
 		console.log('O parse do dom funcionou!!!')
 		const date = moment().subtract(3, 'hours').toDate()
+		console.log('Data atual: ', date)
 		const partidas = await Partida.find({ data: { $lt: date } }).sort({ order: 'asc' })
+		console.log(`Achou ${partidas.length} partidas`)
 		const doc = dom.window.document;
 		const jogos = doc.getElementsByClassName('card-jogo')
 		console.log(`Acho ${jogos.length} jogos`)
