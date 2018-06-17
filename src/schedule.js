@@ -28,13 +28,11 @@ schedule.scheduleJob('*/1 9-17 * * *', async () => {
 				if (resultado.childElementCount > 1) {
 					const placarTimeA = resultado.getElementsByClassName('placar-mandante').item(0).innerHTML
 					const placarTimeB = resultado.getElementsByClassName('placar-visitante').item(0).innerHTML
-					console.log(`Acho jogo com placar ${timeA} ${placarTimeA} x ${placarTimeB} ${timeB}`)
+					console.log(`Acho jogo com placar ${moment(horarioJogo, 'YYYY-MM-DDThh:mm:ss')} ${timeA} ${placarTimeA} x ${placarTimeB} ${timeB}`)
 					if (placarTimeA >= 0 && placarTimeB >= 0) {
 						console.log('Procurando partida')
 						const partida = partidas.find(partida => {
-							console.log('timeA:', partida.timeA.nome == timeA)
-							console.log('timeB:', partida.timeB.nome == timeB)
-							console.log('data:', moment(partida.data, 'YYYY-MM-DDThh:mm:ss').add(3, 'hours').isSame(moment(horarioJogo, 'YYYY-MM-DDThh:mm:ss')))
+							console.log(`Testando partida ${moment(partida.data, 'YYYY-MM-DDThh:mm:ss').add(3, 'hours')} ${partida.timeA.nome} x ${partida.timeB.nome}`)
 							return partida.timeA.nome == timeA &&
 									partida.timeB.nome == timeB &&
 									moment(partida.data, 'YYYY-MM-DDThh:mm:ss').add(3, 'hours').isSame(moment(horarioJogo, 'YYYY-MM-DDThh:mm:ss'))
