@@ -32,10 +32,10 @@ schedule.scheduleJob('*/1 9-17 * * *', async () => {
 					if (placarTimeA >= 0 && placarTimeB >= 0) {
 						console.log('Procurando partida')
 						const partida = partidas.find(partida => {
-							console.log(`Testando partida ${moment(partida.data, 'YYYY-MM-DDThh:mm:ss').add(3, 'hours')} ${partida.timeA.nome} x ${partida.timeB.nome}`)
+							console.log(`Testando partida ${moment(partida.data, 'YYYY-MM-DDThh:mm:ss')} ${partida.timeA.nome} x ${partida.timeB.nome}`)
 							return partida.timeA.nome == timeA &&
 									partida.timeB.nome == timeB &&
-									moment(partida.data, 'YYYY-MM-DDThh:mm:ss').add(3, 'hours').isSame(moment(horarioJogo, 'YYYY-MM-DDThh:mm:ss'))
+									moment(partida.data, 'YYYY-MM-DDThh:mm:ss').isSame(moment(horarioJogo, 'YYYY-MM-DDThh:mm:ss'))
 						})
 						if (partida != null) {
 							console.log(`Achou partida ${partida.timeA.nome} ${partida.placarTimeA} x ${partida.placarTimeB} ${partida.timeB.nome}`)
