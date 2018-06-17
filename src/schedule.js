@@ -8,21 +8,25 @@ schedule.scheduleJob('*/5 9-17 * * *', async () => {
 	console.log('chegou aqui')
 	try {
 		const dom = await JSDOM.fromURL('https://globoesporte.globo.com/placar-ge/hoje/jogos.ghtml')
+		console.log('o dom deu certo')
 		const date = moment().subtract(3, 'hours').toDate()
 		const partidas = await Partida.find({ data: { $lt: date } }).sort({ order: 'asc' })
 		const doc = dom.window.document;
 		const jogos = doc.getElementsByClassName('card-jogo')
+		console.log(`Acho ${jogos.length} jogos`)
 		for (let i = 0; i < jogos.length; i++) {
 			const jogo = jogos.item(i)
 			const nomeJogo = jogo.getElementsByClassName('titulo').item(0).firstElementChild.innerHTML
 			const horarioJogo = jogo.getElementsByClassName('titulo').item(0).lastElementChild.getAttribute('datetime')
 			if (nomeJogo == 'Copa do Mundo da FIFA™') {
+				console.log(`Acho jogo ${timeA} x ${timeB}`)
 				const timeA = jogo.getElementsByClassName('mandante').item(0).firstElementChild.getAttribute('title')
 				const timeB = jogo.getElementsByClassName('visitante').item(0).lastElementChild.getAttribute('title')
 				const resultado = jogo.getElementsByClassName('resultado').item(0)
 				if (resultado.childElementCount > 1) {
 					const placarTimeA = resultado.getElementsByClassName('placar-mandante').item(0).innerHTML
 					const placarTimeB = resultado.getElementsByClassName('placar-visitante').item(0).innerHTML
+					console.log(`Acho jogo com placar ${timeA} ${placarTimeA} x ${placarTimeB} ${timeB}`)
 					if (placarTimeA >= 0 && placarTimeB >= 0) {
 						const partida = partidas.find(partida => {
 							return partida.timeA.nome == timeA &&
