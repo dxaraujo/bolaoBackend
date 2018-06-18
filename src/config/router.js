@@ -1,5 +1,5 @@
 const express = require('express')
-const { authService, faseService, palpiteService, partidaService, timeService, userService } = require('../api')
+const { authService, faseService, palpiteService, partidaService, timeService, userService, resultadoService } = require('../api')
 
 /*
  * Rotas abertas
@@ -20,5 +20,6 @@ api.use('/palpite', palpiteService)
 api.use('/partida', partidaService)
 api.use('/time', timeService)
 api.use('/user', userService)
+api.use('/atualizarresultados', resultadoService)
 
 module.exports = { api, oapi }

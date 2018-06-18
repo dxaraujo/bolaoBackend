@@ -4,5 +4,6 @@ const palpiteService = require('./service/palpiteService')
 const partidaService = require('./service/partidaService')
 const timeService = require('./service/timeService')
 const userService = require('./service/userService')
+const resultadoService = require('./service/resultadoService')
 
-module.exports = { authService, faseService, palpiteService, partidaService, timeService, userService }
+module.exports = { authService, faseService, palpiteService, partidaService, timeService, userService, resultadoService }

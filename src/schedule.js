@@ -21,8 +21,8 @@ schedule.scheduleJob('*/5 9-17 * * *', async () => {
 			const nomeJogo = jogo.getElementsByClassName('titulo').item(0).firstElementChild.innerHTML
 			const horarioJogo = jogo.getElementsByClassName('titulo').item(0).lastElementChild.getAttribute('datetime')
 			if (nomeJogo == 'Copa do Mundo da FIFA™') {
-				const timeA = jogo.getElementsByClassName('mandante').item(0).getElementsByClassName('nome-completo').item(0).innerHTML
-				const timeB = jogo.getElementsByClassName('visitante').item(0).getElementsByClassName('nome-completo').item(0).innerHTML
+				const timeA = jogo.getElementsByClassName('mandante').item(0).getElementsByClassName('nome-abreviado').item(0).innerHTML
+				const timeB = jogo.getElementsByClassName('visitante').item(0).getElementsByClassName('nome-abreviado').item(0).innerHTML
 				console.log(`Acho jogo ${timeA} x ${timeB}`)
 				const resultado = jogo.getElementsByClassName('resultado').item(0)
 				if (resultado.childElementCount > 1) {
@@ -32,8 +32,8 @@ schedule.scheduleJob('*/5 9-17 * * *', async () => {
 					if (placarTimeA >= 0 && placarTimeB >= 0) {
 						console.log('Procurando partida')
 						const partida = partidas.find(partida => {
-							return partida.timeA.nome == timeA &&
-									partida.timeB.nome == timeB &&
+							return partida.timeA.sigla == timeA &&
+									partida.timeB.sigla == timeB &&
 									moment(partida.data, 'YYYY-MM-DDThh:mm:ss').isSame(moment(horarioJogo, 'YYYY-MM-DDThh:mm:ss'))
 						})
 						if (partida != null) {
