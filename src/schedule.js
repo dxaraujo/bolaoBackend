@@ -7,7 +7,7 @@ const atualizarResultados = require('./api/service/resultadoService')
 schedule.scheduleJob('*/5 9-17 * * *', async () => {
 	console.log('chegou aqui')
 	try {
-		const dom = JSDOM.fromURL('https://globoesporte.globo.com/placar-ge/hoje/jogos.ghtml')
+		const dom = await JSDOM.fromURL('https://globoesporte.globo.com/placar-ge/hoje/jogos.ghtml')
 		console.log('O parse do dom funcionou!!!')
 		const date = moment().subtract(3, 'hours').toDate()
 		console.log('Data atual:', date)
