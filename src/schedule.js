@@ -36,7 +36,7 @@ schedule.scheduleJob('*/5 9-17 * * *', async () => {
 								moment(partida.data, 'YYYY-MM-DDThh:mm:ss').add(3, 'hours').isSame(moment(horarioJogo, 'YYYY-MM-DDThh:mm:ss'))
 						})
 						if (partida != null) {
-							console.log(`Acho partida ${partida.timeA.nome} ${partida.placarTimeA} x ${partida.placarTimeB} ${partida.timeB.nome}`)
+							console.log(`Acho partida ${partida.timeA.sigla} ${partida.placarTimeA} x ${partida.placarTimeB} ${partida.timeB.sigla}`)
 							if (partida.placarTimeA != placarTimeA || partida.placarTimeB != placarTimeB) {
 								console.log('achou partida com placar desatualizado')
 								const newPartida = await atualizarResultados(partida._id, { placarTimeA, placarTimeB })
