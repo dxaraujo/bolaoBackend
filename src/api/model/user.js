@@ -23,6 +23,26 @@ const userSchema = new mongoose.Schema({
 		type: String,
 		required: false
 	},
+	placarCheio: {
+		type: Boolean,
+		required: true,
+		default: false
+	},
+	placarTimeVencedorComGol: {
+		type: Boolean,
+		required: true,
+		default: false
+	},
+	placarTimeVencedor: {
+		type: Boolean,
+		required: true,
+		default: false
+	},
+	placarGol: {
+		type: Boolean,
+		required: true,
+		default: false
+	},
 	totalAcumulado: {
 		type: Number,
 		required: true,

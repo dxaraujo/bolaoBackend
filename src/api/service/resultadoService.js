@@ -26,19 +26,28 @@ const atualizarResultados = async (partidaId, placares) => {
 	// Atualizado os dados dos usuários
 	await asyncForEach(users, async user => {
 		if (mapPalpites[user._id]) {
-			let classificacao = null
-			let totalAcumulado = null
+			let indexUltimoPalpite = null
+			let placarCheio = 0
+			let placarTimeVencedorComGol = 0
+			let placarTimeVencedor = 0
+			let placarGol = 0
 			const palpites = mapPalpites[user._id]
 			for (let i = palpites.length - 1; i >= 0; i--) {
 				const palpite = palpites[i];
+				placarCheio += palpite.placarCheio ? 1 : 0
+				placarTimeVencedorComGol += palpite.placarTimeVencedorComGol ? 1 : 0
+				placarTimeVencedor += palpite.palpiteTimeVencedor ? 1 : 0
+				placarGol += palpite.placarGol ? 1 : 0
 				if (palpite.totalAcumulado >= 0 && palpite.classificacao >= 0) {
-					classificacao = palpite.classificacao
-					totalAcumulado = palpite.totalAcumulado
-					break
+					if (indexUltimoPalpite == null) {
+						indexUltimoPalpite = i
+					}
 				}
 			}
-			if (classificacao !== null && totalAcumulado !== null) {
-				user = await User.findByIdAndUpdate(user._id, { classificacao, totalAcumulado }, { new: true })
+			if (indexUltimoPalpite !== null) {
+				let classificacao = palpites[indexUltimoPalpite].classificacao
+				let totalAcumulado = palpites[indexUltimoPalpite].totalAcumulado
+				user = await User.findByIdAndUpdate(user._id, { classificacao, totalAcumulado, placarCheio, placarTimeVencedorComGol, placarTimeVencedor, placarGol }, { new: true })
 			}
 		}
 	})
