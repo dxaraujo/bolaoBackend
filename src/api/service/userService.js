@@ -1,38 +1,43 @@
 const express = require('express')
+const moment = require('moment')
 const User = require('../model/user')
 const Fase = require('../model/fase')
 const Palpite = require('../model/palpite')
-const { respondOrErr, respondErr, respondSuccess, handlerError, asyncForEach } = require('../../util/serviceUtils')
+const { respondOrErr, respondErr, respondSuccess, handlerError } = require('../../util/serviceUtils')
 
 const router = express.Router()
 
 router.get('/', async (req, res, next) => {
-	User.find(req.query).sort({ totalAcumulado: 'desc' }).then(async users => {
+	User.find(req.query).then(async users => {
 		const fases = await Fase.find({ status: 'B' })
-		console.log(fases)
 		for (let i = 0; i < users.length; i++) {
-			users[i] = {
-				_id: users[i]._id,
-				name: users[i].name,
-				username: users[i].username,
-				avatar: users[i].avatar,
-				facebookId: users[i].facebookId,
-				totalAcumulado: users[i].totalAcumulado,
-				classificacao: users[i].classificacao,
-				isAdmin: users[i].isAdmin
-			}
-			let palpites = await Palpite.find({ user: users[i]._id }).sort({ 'partida.data': 'asc' })
+			//console.log('###########################################################################')
+			//console.log(`APOSTAS DE ${users[i].name}`)
+			//console.log('###########################################################################')
+			let palpites = await Palpite.find({ user: users[i]._id }).sort({ 'partida.order': 'asc' })
 			palpites = palpites.filter(palpite => {
 				let result = false
 				for (let j = 0; j < fases.length; j++) {
-					if (fases[j].nome == palpite.partida.fase) {
+					if (fases[j].nome === palpite.partida.fase) {
 						result = true
 						break
 					}
 				}
 				return result
 			})
-			users[i].palpites = palpites
+			//let fase = ''
+			//palpites.forEach(palpite => {
+			//	if (palpite.fase != fase) {
+			//		console.log('---------------------------------------------------------------------------')
+			//		console.log(`${palpite.partida.fase}`)
+			//		console.log('---------------------------------------------------------------------------')
+			//		console.log('Data                 Seleção 1            Placar           Seleção 2')
+			//		fase = palpite.fase
+			//	}
+			//	console.log(`${moment(palpite.partida.data).add(3, 'hours').format('DD/MM/YYYY hh:mm').padEnd(20)} ${palpite.partida.timeA.nome.padEnd(20)} ${palpite.placarTimeA != null ? palpite.placarTimeA : ' '} x ${palpite.placarTimeB != null ? palpite.placarTimeB : ' '}            ${palpite.partida.timeB.nome}`)
+			//})
+			//console.log('')
+			users[i].set('palpites', palpites)
 		}
 		respondSuccess(res, 200, { data: users })
 	}).catch(err => {
@@ -61,22 +66,16 @@ router.put('/:id', (req, res, next) => {
 router.delete('/:id', (req, res, next) => {
 	User.findById(req.params.id).then(async user => {
 		if (user) {
-			console.log('Achou usuário', user)
 			const palpites = await Palpite.find({ user: user._id })
-			console.log('Achou palpites', palpites.length)
 			for (let i = 0; i < palpites.length; i++) {
 				const palpite = palpites[i];
-				console.log('Apagando palpite', palpite._id)
-				console.log(`placarTimeA: ${palpite.placarTimeA}, placarTimeB: ${palpite.placarTimeB}`)
 				const p = await Palpite.findByIdAndRemove(palpite._id)
-				console.log('Palpite apagado', p._id)
 			}
-			console.log('Apagando usuário', user._id)
 			const data = await User.findByIdAndRemove(user._id)
-			console.log('Usuário apagado', data._id)
 			respondSuccess(res, 200, { data })
+		} else {
+			respondSuccess(res, 200, { data: 'Usuário não encontrado' })
 		}
-		respondSuccess(res, 200, { data: 'Usuário não encontrado' })
 	}).catch(err => {
 		respondErr(next, 500, err)
 	})

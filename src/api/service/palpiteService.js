@@ -52,7 +52,7 @@ router.get('/:user/:fase/montarpalpites', (req, res, next) => {
 	const user = req.params.user
 	const fase = req.params.fase
 	Palpite.find({ user }).then(async palpites => {
-		let partidas = await Partida.find({ fase }).sort({ 'data': 'asc' })
+		let partidas = await Partida.find({ fase }).sort({ order: 'asc' })
 		if (!palpites.length) {
 			partidas.forEach(partida => {
 				delete partida.placarTimeA
@@ -113,7 +113,7 @@ const ordernarPalpites = (palpites) => {
 		if (test === 0) {
 			const test1 = p1.partida.rodada.localeCompare(p2.partida.rodada)
 			if (test1 === 0) {
-				return p1.partida.data - p2.partida.data
+				return p1.partida.order - p2.partida.order
 			}
 			return test1
 		}

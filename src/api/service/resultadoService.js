@@ -1,55 +1,135 @@
-const express = require('express')
-const moment = require('moment')
 const Partida = require('../model/partida')
-const { JSDOM } = require('jsdom')
-const { respondErr, respondSuccess, handlerError } = require('../../util/serviceUtils')
+const Palpite = require('../model/palpite')
+const User = require('../model/user')
+const { asyncForEach } = require('../../util/serviceUtils')
 
-const router = express.Router()
+const atualizarResultados = async (partidaId, placares) => {
+	const newPartida = await Partida.findByIdAndUpdate(partidaId, placares, { new: true })
+	const partidas = await Partida.find({}).sort({ order: 'asc' })
+	const users = await User.find({})
+	let mapPalpites = []
 
-router.get('/', (req, res, next) => {
-	try {
-		JSDOM.fromURL('https://globoesporte.globo.com/placar-ge/hoje/jogos.ghtml').then(async dom => {
+	// Atualizado o total de ponto acumulados
+	await asyncForEach(users, async user => {
+		let palpites = await Palpite.find({ user: user._id }).sort({ 'partida.order': 'asc' })
+		mapPalpites[user._id] = autalizarTotalAcumulado(partidas, palpites)
+	})
 
-			const document = dom.window.document
-			const jogos = document.getElementsByClassName('card-jogo')
+	// Atualizado a classificação dos usuários
+	await asyncForEach(partidas, async partida => {
+		if (partida.placarTimeA >= 0 && partida.placarTimeB >= 0) {
+			let palpites = users.map(user => findPalpite(mapPalpites[user._id], partida))
+			palpites = await classificarPalpites(palpites)
+		}
+	})
 
-			const partidas = await Partida.find({ data: { $lt: moment.utc(new Date()).add(3, 'hours').toDate() } }).sort({ data: 'asc' })
-
-			for (let i = 0; i < jogos.length; i++) {
-				const nomeJogo = jogos.item(i).getElementsByClassName('titulo').item(0).firstElementChild.innerHTML
-				const dataHoraJogo = jogos.item(i).getElementsByClassName('titulo').item(0).getElementsByClassName('hora-local').item(0).getAttribute('content')
-				if (nomeJogo == 'Copa do Mundo da FIFA™') {
-
-					const nomeTimeA = jogos.item(i).getElementsByClassName('mandante').item(0).getElementsByClassName('nome-completo').item(0).innerHTML
-					const nomeTimeB = jogos.item(i).getElementsByClassName('visitante').item(0).getElementsByClassName('nome-completo').item(0).innerHTML
-
-					const resultado = jogos.item(i).getElementsByClassName('resultado')
-					const placarTimeA = resultado.item(0).getElementsByClassName('placar-mandante').item(0).innerHTML
-					const placarTimeB = resultado.item(0).getElementsByClassName('placar-visitante').item(0).innerHTML
-
-					console.log(dataHoraJogo)
-					console.log(nomeTimeA)
-					console.log(nomeTimeB)
-					partidas.forEach(async partida => {
-						if (partida.timeA.nome == nomeTimeA &&
-							partida.timeB.nome == nomeTimeB &&
-							moment(partida.data).isSame(moment(dataHoraJogo, 'YYYY-MM-DDThh:mm:ss'))) {
-							console.log('achou partida')
-							console.log(partida)
-							console.log(placarTimeA)
-							console.log(placarTimeB)
-							partida = await Partida.findByIdAndUpdate(partida._id, { placarTimeA, placarTimeB }, { new: true })
-						}
-					});
+	// Atualizado os dados dos usuários
+	await asyncForEach(users, async user => {
+		if (mapPalpites[user._id]) {
+			let classificacao = null
+			let totalAcumulado = null
+			const palpites = mapPalpites[user._id]
+			for (let i = palpites.length - 1; i >= 0; i--) {
+				const palpite = palpites[i];
+				if (palpite.totalAcumulado >= 0 && palpite.classificacao >= 0) {
+					classificacao = palpite.classificacao
+					totalAcumulado = palpite.totalAcumulado
+					break
 				}
 			}
-			respondSuccess(res, 200, { data: 'Só sucesso' })
-		})
-	} catch (err) {
-		respondErr(next, 500, err)
+			if (classificacao !== null && totalAcumulado !== null) {
+				user = await User.findByIdAndUpdate(user._id, { classificacao, totalAcumulado }, { new: true })
+			}
+		}
+	})
+	return newPartida
+}
+
+const findPalpite = (palpites, partida) => {
+	return palpites.find(palpite => {
+		return palpite.partida.fase === partida.fase &&
+			palpite.partida.grupo === partida.grupo &&
+			palpite.partida.rodada === partida.rodada &&
+			palpite.partida.timeA.nome === partida.timeA.nome &&
+			palpite.partida.timeB.nome === partida.timeB.nome
+	})
+}
+
+const autalizarTotalAcumulado = (partidas, palpites) => {
+	let totalAcumulado = 0
+	partidas.forEach(partida => {
+		if (partida.placarTimeA >= 0 && partida.placarTimeB >= 0) {
+			let palpite = findPalpite(palpites, partida)
+			if (palpite != null) {
+				palpite = calcularPontuacaoPalpite(palpite, partida)
+				totalAcumulado += palpite.totalPontosObitidos
+				palpite.totalAcumulado = totalAcumulado
+			}
+		}
+	})
+	return palpites
+}
+
+const classificarPalpites = async (palpites) => {
+	let cla = 1
+	let mesmoplacar = 1
+	palpites = palpites.filter(palpite => palpite)
+	palpites = palpites.sort((p1, p2) => p2.totalAcumulado - p1.totalAcumulado)
+	for (let i = 0; i < palpites.length; i++) {
+		if (i > 0) {
+			if (palpites[i].totalAcumulado === palpites[i - 1].totalAcumulado) {
+				cla = palpites[i - 1].classificacao
+				mesmoplacar += 1
+			} else {
+				cla = cla + mesmoplacar
+				mesmoplacar = 1
+			}
+		}
+		palpites[i].classificacao = cla
+		palpites[i] = await Palpite.findByIdAndUpdate(palpites[i]._id, palpites[i], { new: true })
 	}
-})
+	return palpites
+}
 
-router.use(handlerError)
+const calcularPontuacaoPalpite = (palpite, partida) => {
+	if (palpite.placarTimeA >= 0 && palpite.placarTimeB >= 0) {
+		const palpiteTimeVencedor = palpite.placarTimeA > palpite.placarTimeB ? 'A' : palpite.placarTimeB > palpite.placarTimeA ? 'B' : 'E'
+		const partidaTimeVencedor = partida.placarTimeA > partida.placarTimeB ? 'A' : partida.placarTimeB > partida.placarTimeA ? 'B' : 'E'
+		if (palpite.placarTimeA === partida.placarTimeA && palpite.placarTimeB === partida.placarTimeB) {
+			palpite.totalPontosObitidos = 5
+			palpite.placarCheio = true
+			palpite.placarTimeVencedorComGol = false
+			palpite.placarTimeVencedor = false
+			palpite.placarGol = false
+		} else if (palpiteTimeVencedor === partidaTimeVencedor) {
+			if (palpite.placarTimeA === partida.placarTimeA || palpite.placarTimeB === partida.placarTimeB) {
+				palpite.totalPontosObitidos = 3
+				palpite.placarCheio = false
+				palpite.placarTimeVencedorComGol = true
+				palpite.placarTimeVencedor = false
+				palpite.placarGol = false
+			} else {
+				palpite.totalPontosObitidos = 2
+				palpite.placarCheio = false
+				palpite.placarTimeVencedorComGol = false
+				palpite.placarTimeVencedor = true
+				palpite.placarGol = false
+			}
+		} else if (palpite.placarTimeA === partida.placarTimeA || palpite.placarTimeB === partida.placarTimeB) {
+			palpite.totalPontosObitidos = 1
+			palpite.placarCheio = false
+			palpite.placarTimeVencedorComGol = false
+			palpite.placarTimeVencedor = false
+			palpite.placarGol = true
+		} else {
+			palpite.totalPontosObitidos = 0
+			palpite.placarCheio = false
+			palpite.placarTimeVencedorComGol = false
+			palpite.placarTimeVencedor = false
+			palpite.placarGol = false
+		}
+	}
+	return palpite
+}
 
-exports = module.exports = router
+exports = module.exports = atualizarResultados

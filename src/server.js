@@ -22,3 +22,5 @@ server.listen(port, () => {
 		console.log('DATABASE is running')
 	})
 })
+
+const schedule = require('./schedule')
