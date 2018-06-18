@@ -24,24 +24,24 @@ const userSchema = new mongoose.Schema({
 		required: false
 	},
 	placarCheio: {
-		type: Boolean,
+		type: Number,
 		required: true,
-		default: false
+		default: 0
 	},
 	placarTimeVencedorComGol: {
-		type: Boolean,
+		type: Number,
 		required: true,
-		default: false
+		default: 0
 	},
 	placarTimeVencedor: {
-		type: Boolean,
+		type: Number,
 		required: true,
-		default: false
+		default: 0
 	},
 	placarGol: {
-		type: Boolean,
+		type: Number,
 		required: true,
-		default: false
+		default: 0
 	},
 	totalAcumulado: {
 		type: Number,
