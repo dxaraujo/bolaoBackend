@@ -1,57 +1,84 @@
 const Partida = require('../model/partida')
 const Palpite = require('../model/palpite')
 const User = require('../model/user')
-const { asyncForEach } = require('../../util/serviceUtils')
 
 const atualizarResultados = async (partidaId, placares) => {
+
 	const newPartida = await Partida.findByIdAndUpdate(partidaId, placares, { new: true })
 	const partidas = await Partida.find({}).sort({ order: 'asc' })
-	const users = await User.find({})
-	let mapPalpites = []
+	let users = await User.find({})
 
-	// Atualizado o total de ponto acumulados
-	await asyncForEach(users, async user => {
-		let palpites = await Palpite.find({ user: user._id }).sort({ 'partida.order': 'asc' })
-		mapPalpites[user._id] = autalizarTotalAcumulado(partidas, palpites)
-	})
+	// Montando os dados dos usuários
+	console.log('Montando os dados dos usuários')
+	for (let i = 0; i < users.length; i++) {
+		users[i] = { _id: users[i]._id }
+		users[i].totalAcumulado = 0
+		users[i].classificacao = 0
+		users[i].placarCheio = 0
+		users[i].placarTimeVencedorComGol = 0
+		users[i].placarTimeVencedor = 0
+		users[i].placarGol = 0
+		console.log('Consultando palpites usuários')
+		users[i].palpites = await Palpite.find({ user: user._id }).sort({ 'partida.order': 'asc' })
+		console.log(`Foram encontrados ${users[i].palpites.length} palpites`)
+	}
 
-	// Atualizado a classificação dos usuários
-	await asyncForEach(partidas, async partida => {
+	// Calculando os pontos acertados
+	console.log('Calculando os pontos acertados')
+	for (let i = 0; i < partidas.length; i++) {
+		const partida = partidas[i]
 		if (partida.placarTimeA >= 0 && partida.placarTimeB >= 0) {
-			let palpites = users.map(user => findPalpite(mapPalpites[user._id], partida))
-			palpites = await classificarPalpites(palpites)
-		}
-	})
-
-	// Atualizado os dados dos usuários
-	await asyncForEach(users, async user => {
-		if (mapPalpites[user._id]) {
-			let indexUltimoPalpite = null
-			let placarCheio = 0
-			let placarTimeVencedorComGol = 0
-			let placarTimeVencedor = 0
-			let placarGol = 0
-			const palpites = mapPalpites[user._id]
-			for (let i = palpites.length - 1; i >= 0; i--) {
-				const palpite = palpites[i];
-				placarCheio += palpite.placarCheio ? 1 : 0
-				placarTimeVencedorComGol += palpite.placarTimeVencedorComGol ? 1 : 0
-				placarTimeVencedor += palpite.placarTimeVencedor ? 1 : 0
-				placarGol += palpite.placarGol ? 1 : 0
-				if (palpite.totalAcumulado >= 0 && palpite.classificacao >= 0) {
-					if (indexUltimoPalpite == null) {
-						indexUltimoPalpite = i
-					}
+			for (let j = 0; j < users.length; j++) {
+				let user = users[j]
+				let palpite = findPalpite(user.palpites, partida)
+				if (palpite != null) {
+					palpite = calcularPontuacaoPalpite(palpite, partida)
+					user.totalAcumulado += palpite.totalPontosObitidos
+					user.placarCheio += palpite.placarCheio ? 1 : 0
+					user.placarTimeVencedorComGol += palpite.placarTimeVencedorComGol ? 1 : 0
+					user.placarTimeVencedor += palpite.placarTimeVencedor ? 1 : 0
+					user.placarGol += palpite.placarGol ? 1 : 0
+					palpite.totalAcumulado = user.totalAcumulado
 				}
 			}
-			if (indexUltimoPalpite != null) {
-				let classificacao = palpites[indexUltimoPalpite].classificacao
-				let classificacaoAnterior = indexUltimoPalpite > 0 ? palpites[indexUltimoPalpite - 1].classificacao : 0
-				let totalAcumulado = palpites[indexUltimoPalpite].totalAcumulado
-				user = await User.findByIdAndUpdate(user._id, { classificacao, classificacaoAnterior, totalAcumulado, placarCheio, placarTimeVencedorComGol, placarTimeVencedor, placarGol }, { new: true })
+			users = classificar(users)
+			for (let j = 0; j < users.length; j++) {
+				let palpite = findPalpite(users[j].palpites, partida)
+				if (palpite != null) {
+					palpite.classificacao = users[j].classificacao
+				}
 			}
 		}
-	})
+	}
+
+	// Salvando os dados
+	console.log('Salvando os dados')
+	for (let i = 0; i < users.length; i++) {
+		users[i] = await User.findByIdAndUpdate(users[i]._id, {
+			totalAcumulado: users[i].totalAcumulado,
+			classificacao: users[i].classificacao,
+			placarCheio: users[i].placarCheio,
+			placarTimeVencedorComGol: users[i].placarTimeVencedorComGol,
+			placarTimeVencedor: users[i].placarTimeVencedor,
+			placarGol: users[i].placarGol,
+		}, { new: true })
+		console.log(`Usuário: ${users[i]._id} salvo com sucesso`)
+		for (let j = 0; j < users[i].palpites.length; j++) {
+			let palpite = users[i].palpites[j]
+			palpite = await Palpite.findByIdAndUpdate(palpite._id, {
+				totalPontosObitidos: palpite.totalPontosObitidos,
+				totalAcumulado: palpite.totalAcumulado,
+				classificacao: palpite.classificacao,
+				placarCheio: palpite.placarCheio,
+				placarTimeVencedorComGol: palpite.placarTimeVencedorComGol,
+				placarTimeVencedor: palpite.placarTimeVencedor,
+				placarGol: palpite.placarGol,
+			}, { new: true })
+			console.log(`Palpite: ${palpite._id} salvo com sucesso`)
+		}
+	}
+
+	console.log('Retornando os dados da partida')
 	return newPartida
 }
 
@@ -65,40 +92,23 @@ const findPalpite = (palpites, partida) => {
 	})
 }
 
-const autalizarTotalAcumulado = (partidas, palpites) => {
-	let totalAcumulado = 0
-	partidas.forEach(partida => {
-		if (partida.placarTimeA >= 0 && partida.placarTimeB >= 0) {
-			let palpite = findPalpite(palpites, partida)
-			if (palpite != null) {
-				palpite = calcularPontuacaoPalpite(palpite, partida)
-				totalAcumulado += palpite.totalPontosObitidos
-				palpite.totalAcumulado = totalAcumulado
-			}
-		}
-	})
-	return palpites
-}
-
-const classificarPalpites = async (palpites) => {
+const classificar = (users) => {
 	let cla = 1
 	let mesmoplacar = 1
-	palpites = palpites.filter(palpite => palpite)
-	palpites = palpites.sort((p1, p2) => p2.totalAcumulado - p1.totalAcumulado)
-	for (let i = 0; i < palpites.length; i++) {
+	users = ordenarUsuarios(users)
+	for (let i = 0; i < users.length; i++) {
 		if (i > 0) {
-			if (palpites[i].totalAcumulado === palpites[i - 1].totalAcumulado) {
-				cla = palpites[i - 1].classificacao
+			if (compararUsuarios(users[i], users[i - 1]) === 0) {
+				cla = users[i - 1].classificacao
 				mesmoplacar += 1
 			} else {
 				cla = cla + mesmoplacar
 				mesmoplacar = 1
 			}
 		}
-		palpites[i].classificacao = cla
-		palpites[i] = await Palpite.findByIdAndUpdate(palpites[i]._id, palpites[i], { new: true })
+		users[i].classificacao = cla
 	}
-	return palpites
+	return users
 }
 
 const calcularPontuacaoPalpite = (palpite, partida) => {
@@ -140,6 +150,30 @@ const calcularPontuacaoPalpite = (palpite, partida) => {
 		}
 	}
 	return palpite
+}
+
+const ordenarUsuarios = users => {
+	return users.sort((u1, u2) => compararUsuarios(u1, u2))
+}
+
+const compararUsuarios = (u1, u2) => {
+	const test0 = u2.totalAcumulado.valueOf() - u1.totalAcumulado.valueOf()
+	if (test0 === 0) {
+		const test1 = u2.placarCheio.valueOf() - u1.placarCheio.valueOf()
+		if (test1 === 0) {
+			const test2 = u2.placarTimeVencedorComGol.valueOf() - u1.placarTimeVencedorComGol.valueOf()
+			if (test2 === 0) {
+				const test3 = u2.placarTimeVencedor.valueOf() - u1.placarTimeVencedor.valueOf()
+				if (test3 === 0) {
+					return u2.placarGol.valueOf() - u1.placarGol.valueOf()
+				}
+				return test3
+			}
+			return test2
+		}
+		return test1
+	}
+	return test0
 }
 
 exports = module.exports = atualizarResultados
