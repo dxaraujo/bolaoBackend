@@ -46,8 +46,9 @@ const atualizarResultados = async (partidaId, placares) => {
 			}
 			if (indexUltimoPalpite != null) {
 				let classificacao = palpites[indexUltimoPalpite].classificacao
+				let classificacaoAnterior = indexUltimoPalpite > 0 ? palpites[indexUltimoPalpite - 1].classificacao : 0
 				let totalAcumulado = palpites[indexUltimoPalpite].totalAcumulado
-				user = await User.findByIdAndUpdate(user._id, { classificacao, totalAcumulado, placarCheio, placarTimeVencedorComGol, placarTimeVencedor, placarGol }, { new: true })
+				user = await User.findByIdAndUpdate(user._id, { classificacao, classificacaoAnterior, totalAcumulado, placarCheio, placarTimeVencedorComGol, placarTimeVencedor, placarGol }, { new: true })
 			}
 		}
 	})

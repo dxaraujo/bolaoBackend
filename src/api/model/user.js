@@ -53,6 +53,11 @@ const userSchema = new mongoose.Schema({
 		required: true,
 		default: 0
 	},
+	classificacaoAnterior: {
+		type: Number,
+		required: true,
+		default: 0
+	},
 	isAdmin: {
 		type: Boolean,
 		required: true,
