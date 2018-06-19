@@ -1,6 +1,7 @@
 const Partida = require('../model/partida')
 const Palpite = require('../model/palpite')
 const User = require('../model/user')
+const { asyncForEach } = require('../../util/serviceUtils')
 
 const atualizarResultados = async (partidaId, placares) => {
 
@@ -10,7 +11,7 @@ const atualizarResultados = async (partidaId, placares) => {
 
 	// Montando os dados dos usuários
 	console.log('Montando os dados dos usuários')
-	for (let i = 0; i < users.length; i++) {
+	await asyncForEach(users, async (user, i, users) => {
 		users[i] = { _id: users[i]._id }
 		users[i].totalAcumulado = 0
 		users[i].classificacao = 0
@@ -21,7 +22,7 @@ const atualizarResultados = async (partidaId, placares) => {
 		console.log('Consultando palpites usuários')
 		users[i].palpites = await Palpite.find({ user: users[i]._id }).sort({ 'partida.order': 'asc' })
 		console.log(`Foram encontrados ${users[i].palpites.length} palpites`)
-	}
+	})
 
 	// Calculando os pontos acertados
 	console.log('Calculando os pontos acertados')
@@ -29,16 +30,15 @@ const atualizarResultados = async (partidaId, placares) => {
 		const partida = partidas[i]
 		if (partida.placarTimeA >= 0 && partida.placarTimeB >= 0) {
 			for (let j = 0; j < users.length; j++) {
-				let user = users[j]
-				let palpite = findPalpite(user.palpites, partida)
+				let palpite = findPalpite(users[j].palpites, partida)
 				if (palpite != null) {
 					palpite = calcularPontuacaoPalpite(palpite, partida)
-					user.totalAcumulado += palpite.totalPontosObitidos
-					user.placarCheio += palpite.placarCheio ? 1 : 0
-					user.placarTimeVencedorComGol += palpite.placarTimeVencedorComGol ? 1 : 0
-					user.placarTimeVencedor += palpite.placarTimeVencedor ? 1 : 0
-					user.placarGol += palpite.placarGol ? 1 : 0
-					palpite.totalAcumulado = user.totalAcumulado
+					users[j].totalAcumulado += palpite.totalPontosObitidos
+					users[j].placarCheio += palpite.placarCheio ? 1 : 0
+					users[j].placarTimeVencedorComGol += palpite.placarTimeVencedorComGol ? 1 : 0
+					users[j].placarTimeVencedor += palpite.placarTimeVencedor ? 1 : 0
+					users[j].placarGol += palpite.placarGol ? 1 : 0
+					palpite.totalAcumulado = users[j].totalAcumulado
 				}
 			}
 			users = classificar(users)
@@ -53,7 +53,7 @@ const atualizarResultados = async (partidaId, placares) => {
 
 	// Salvando os dados
 	console.log('Salvando os dados')
-	for (let i = 0; i < users.length; i++) {
+	await asyncForEach(users, async (user, i, users) => {
 		users[i] = await User.findByIdAndUpdate(users[i]._id, {
 			totalAcumulado: users[i].totalAcumulado,
 			classificacao: users[i].classificacao,
@@ -63,20 +63,19 @@ const atualizarResultados = async (partidaId, placares) => {
 			placarGol: users[i].placarGol,
 		}, { new: true })
 		console.log(`Usuário: ${users[i]._id} salvo com sucesso`)
-		for (let j = 0; j < users[i].palpites.length; j++) {
-			let palpite = users[i].palpites[j]
-			palpite = await Palpite.findByIdAndUpdate(palpite._id, {
-				totalPontosObitidos: palpite.totalPontosObitidos,
-				totalAcumulado: palpite.totalAcumulado,
-				classificacao: palpite.classificacao,
-				placarCheio: palpite.placarCheio,
-				placarTimeVencedorComGol: palpite.placarTimeVencedorComGol,
-				placarTimeVencedor: palpite.placarTimeVencedor,
-				placarGol: palpite.placarGol,
+		await asyncForEach(users[i].palpites, async (palpite, j, palpites) => {
+			palpites[j] = await Palpite.findByIdAndUpdate(palpite._id, {
+				totalPontosObitidos: palpites[j].totalPontosObitidos,
+				totalAcumulado: palpites[j].totalAcumulado,
+				classificacao: palpites[j].classificacao,
+				placarCheio: palpites[j].placarCheio,
+				placarTimeVencedorComGol: palpites[j].placarTimeVencedorComGol,
+				placarTimeVencedor: palpites[j].placarTimeVencedor,
+				placarGol: palpites[j].placarGol,
 			}, { new: true })
-			console.log(`Palpite: ${palpite._id} salvo com sucesso`)
-		}
-	}
+			console.log(`Palpite: ${palpites[j]._id} salvo com sucesso`)
+		})
+	})
 
 	console.log('Retornando os dados da partida')
 	return newPartida
