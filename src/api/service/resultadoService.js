@@ -36,7 +36,7 @@ const atualizarResultados = async (partidaId, placares) => {
 				const palpite = palpites[i];
 				placarCheio += palpite.placarCheio ? 1 : 0
 				placarTimeVencedorComGol += palpite.placarTimeVencedorComGol ? 1 : 0
-				placarTimeVencedor += palpite.palpiteTimeVencedor ? 1 : 0
+				placarTimeVencedor += palpite.placarTimeVencedor ? 1 : 0
 				placarGol += palpite.placarGol ? 1 : 0
 				if (palpite.totalAcumulado >= 0 && palpite.classificacao >= 0) {
 					if (indexUltimoPalpite == null) {
