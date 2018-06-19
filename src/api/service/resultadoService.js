@@ -54,15 +54,6 @@ const atualizarResultados = async (partidaId, placares) => {
 	// Salvando os dados
 	console.log('Salvando os dados')
 	await asyncForEach(users, async (user, i, users) => {
-		users[i] = await User.findByIdAndUpdate(users[i]._id, {
-			totalAcumulado: users[i].totalAcumulado,
-			classificacao: users[i].classificacao,
-			placarCheio: users[i].placarCheio,
-			placarTimeVencedorComGol: users[i].placarTimeVencedorComGol,
-			placarTimeVencedor: users[i].placarTimeVencedor,
-			placarGol: users[i].placarGol,
-		}, { new: true })
-		console.log(`Usuário: ${users[i]._id} salvo com sucesso`)
 		await asyncForEach(users[i].palpites, async (palpite, j, palpites) => {
 			palpites[j] = await Palpite.findByIdAndUpdate(palpite._id, {
 				totalPontosObitidos: palpites[j].totalPontosObitidos,
@@ -75,6 +66,16 @@ const atualizarResultados = async (partidaId, placares) => {
 			}, { new: true })
 			console.log(`Palpite: ${palpites[j]._id} salvo com sucesso`)
 		})
+		users[i] = await User.findByIdAndUpdate(users[i]._id, {
+			totalAcumulado: users[i].totalAcumulado,
+			classificacao: users[i].classificacao,
+			placarCheio: users[i].placarCheio,
+			placarTimeVencedorComGol: users[i].placarTimeVencedorComGol,
+			placarTimeVencedor: users[i].placarTimeVencedor,
+			placarGol: users[i].placarGol,
+		}, { new: true })
+		console.log(`Usuário: ${users[i]._id} salvo com sucesso`)
+
 	})
 
 	console.log('Retornando os dados da partida')
