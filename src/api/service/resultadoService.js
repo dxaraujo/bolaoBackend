@@ -1,7 +1,6 @@
 const Partida = require('../model/partida')
 const Palpite = require('../model/palpite')
 const User = require('../model/user')
-const { asyncForEach } = require('../../util/serviceUtils')
 
 const atualizarResultados = async (partidaId, placares) => {
 
@@ -11,8 +10,8 @@ const atualizarResultados = async (partidaId, placares) => {
 
 	// Montando os dados dos usuários
 	console.log('Montando os dados dos usuários')
-	await asyncForEach(users, async (user, i, users) => {
-		users[i] = { _id: user._id }
+	for (let i = 0; i < users.length; i++) {
+		users[i] = { _id: users[i]._id }
 		users[i].totalAcumulado = 0
 		users[i].classificacao = 0
 		users[i].placarCheio = 0
@@ -20,9 +19,9 @@ const atualizarResultados = async (partidaId, placares) => {
 		users[i].placarTimeVencedor = 0
 		users[i].placarGol = 0
 		console.log('Consultando palpites usuários')
-		users[i].palpites = await Palpite.find({ user: user._id }).sort({ 'partida.order': 'asc' })
+		users[i].palpites = await Palpite.find({ user: users[i]._id }).sort({ 'partida.order': 'asc' })
 		console.log(`Foram encontrados ${users[i].palpites.length} palpites`)
-	})
+	}
 
 	// Calculando os pontos acertados
 	console.log('Calculando os pontos acertados')
