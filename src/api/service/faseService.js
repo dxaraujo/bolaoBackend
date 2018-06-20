@@ -7,6 +7,7 @@ const router = express.Router()
 
 router.get('/', (req, res, next) => {
 	Fase.find(req.query, (err, data) => {
+		console.log(data)
 		respondOrErr(res, next, 500, err, 200, { data })
 	})
 })
