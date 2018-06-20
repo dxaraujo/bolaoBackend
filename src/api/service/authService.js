@@ -57,9 +57,9 @@ const login = (req, res) => {
 		if (err) {
 			console.log(err)
 		} else if (user && bcrypt.compareSync(password, user.password)) {
-			delete user.password
-			delete user.avatar
-			delete user.contentType
+			user.password = null
+			user.avatar = null
+			user.contentType = null
 			console.log(user)
 			const token = jwt.sign(user.toJSON(), env.authSecret, { expiresIn: "1 day" })
 			res.json({ token })
