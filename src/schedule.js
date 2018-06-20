@@ -4,7 +4,7 @@ const { JSDOM } = require('jsdom')
 const Partida = require('./api/model/partida')
 const atualizarResultados = require('./api/service/resultadoService')
 
-schedule.scheduleJob('*/5 12-18 * * *', async () => {
+schedule.scheduleJob('*/5 12-20 * * *', async () => {
 	console.log('chegou aqui')
 	try {
 		const dom = await JSDOM.fromURL('https://globoesporte.globo.com/placar-ge/hoje/jogos.ghtml')

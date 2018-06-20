@@ -57,7 +57,9 @@ const login = (req, res) => {
 		if (err) {
 			console.log(err)
 		} else if (user && bcrypt.compareSync(password, user.password)) {
-			delete user.password
+			user.password = null
+			user.avatar = null
+			user.contentType = null
 			const token = jwt.sign(user.toJSON(), env.authSecret, { expiresIn: "1 day" })
 			res.json({ token })
 		} else {
@@ -84,7 +86,6 @@ const signup = (req, res) => {
 	const password = req.body.password || ''
 	const confirmPassword = req.body.confirmPassword || ''
 	const facebookId = req.body.facebookId || ''
-	const avatar = req.body.avatar || ''
 
 	if (!password.match(passwordRegex)) {
 		return res.status(400).send({
@@ -111,7 +112,7 @@ const signup = (req, res) => {
 				errors: ['Usuário já cadastrado.']
 			})
 		} else {
-			const newUser = new User({ name, username, password: passwordHash, facebookId, avatar })
+			const newUser = new User({ name, username, password: passwordHash, facebookId })
 			newUser.save(err => {
 				if (err) {
 					console.log(err)
@@ -123,4 +124,10 @@ const signup = (req, res) => {
 	})
 }
 
-module.exports = { auth, login, signup, validateToken, registerFacebookUser }
+const retrieveAvatar = (req, res, next) => {
+	User.findById(req.params.id, (err, user) => {
+		res.status(200).contentType(user.contentType).send(user.avatar)
+	});
+}
+
+module.exports = { auth, login, signup, validateToken, registerFacebookUser, retrieveAvatar }
