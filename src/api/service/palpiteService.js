@@ -1,4 +1,5 @@
 const express = require('express')
+const Fase = require('../model/fase')
 const Palpite = require('../model/palpite')
 const Partida = require('../model/partida')
 const { respondOrErr, respondSuccess, respondErr, handlerError } = require('../../util/serviceUtils')
@@ -50,9 +51,10 @@ router.put('/:user/updatePalpites', (req, res, next) => {
 
 router.get('/:user/:fase/montarpalpites', (req, res, next) => {
 	const user = req.params.user
-	const fase = req.params.fase
+	const faseId = req.params.fase
 	Palpite.find({ user }).then(async palpites => {
-		let partidas = await Partida.find({ fase }).sort({ order: 'asc' })
+		const fase = await Fase.findById(faseId);
+		let partidas = await Partida.find({ fase: fase.nome }).sort({ order: 'asc' })
 		if (!palpites.length) {
 			partidas.forEach(partida => {
 				delete partida.placarTimeA
