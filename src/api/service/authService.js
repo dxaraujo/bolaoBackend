@@ -123,4 +123,10 @@ const signup = (req, res) => {
 	})
 }
 
-module.exports = { auth, login, signup, validateToken, registerFacebookUser }
+const retrieveAvatar = (req, res, next) => {
+	User.findById(req.params.id, (err, user) => {
+		res.status(200).contentType(user.contentType).send(user.avatar)
+	});
+}
+
+module.exports = { auth, login, signup, validateToken, registerFacebookUser, retrieveAvatar }
