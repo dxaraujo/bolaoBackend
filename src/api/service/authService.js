@@ -111,7 +111,7 @@ const signup = (req, res) => {
 				errors: ['Usuário já cadastrado.']
 			})
 		} else {
-			const newUser = new User({ name, username, password: passwordHash, facebookId, avatar })
+			const newUser = new User({ name, username, password: passwordHash, facebookId })
 			newUser.save(err => {
 				if (err) {
 					console.log(err)
