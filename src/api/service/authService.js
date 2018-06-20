@@ -58,6 +58,7 @@ const login = (req, res) => {
 			console.log(err)
 		} else if (user && bcrypt.compareSync(password, user.password)) {
 			delete user.password
+			delete user.avatar
 			const token = jwt.sign(user.toJSON(), env.authSecret, { expiresIn: "1 day" })
 			res.json({ token })
 		} else {
@@ -84,7 +85,6 @@ const signup = (req, res) => {
 	const password = req.body.password || ''
 	const confirmPassword = req.body.confirmPassword || ''
 	const facebookId = req.body.facebookId || ''
-	const avatar = req.body.avatar || ''
 
 	if (!password.match(passwordRegex)) {
 		return res.status(400).send({
