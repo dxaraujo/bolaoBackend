@@ -14,6 +14,7 @@ const atualizarResultados = async (partidaId, placares) => {
 		users[i] = { _id: users[i]._id }
 		users[i].totalAcumulado = 0
 		users[i].classificacao = 0
+		users[i].classificacaoAnterior = 0
 		users[i].placarCheio = 0
 		users[i].placarTimeVencedorComGol = 0
 		users[i].placarTimeVencedor = 0
@@ -37,7 +38,7 @@ const atualizarResultados = async (partidaId, placares) => {
 					palpite.totalAcumulado = users[j].totalAcumulado
 				}
 			}
-			users = classificar(users)
+			users = classificar(users, i)
 			for (let j = 0; j < users.length; j++) {
 				let palpite = findPalpite(users[j].palpites, partida)
 				if (palpite != null) {
@@ -63,6 +64,7 @@ const atualizarResultados = async (partidaId, placares) => {
 		users[i] = await User.findByIdAndUpdate(users[i]._id, {
 			totalAcumulado: users[i].totalAcumulado,
 			classificacao: users[i].classificacao,
+			classificacaoAnterior: users[i].classificacaoAnterior,
 			placarCheio: users[i].placarCheio,
 			placarTimeVencedorComGol: users[i].placarTimeVencedorComGol,
 			placarTimeVencedor: users[i].placarTimeVencedor,
@@ -83,7 +85,7 @@ const findPalpite = (palpites, partida) => {
 	})
 }
 
-const classificar = (users) => {
+const classificar = (users, index) => {
 	let cla = 1
 	let mesmoplacar = 1
 	users = ordenarUsuarios(users)
@@ -97,6 +99,7 @@ const classificar = (users) => {
 				mesmoplacar = 1
 			}
 		}
+		users[i].classificacaoAnterior = index > 0 ? users[i].classificacao : 0
 		users[i].classificacao = cla
 	}
 	return users
