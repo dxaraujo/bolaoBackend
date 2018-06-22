@@ -101,7 +101,7 @@ const classificar = (users, index) => {
 				mesmoplacar = 1
 			}
 		}
-		users[i].classificacaoAnterior = index > 0 ? users[i].classificacao : 0
+		users[i].classificacaoAnterior = index > 0 ? users[i].classificacao : undefined
 		users[i].classificacao = cla
 	}
 	return users
