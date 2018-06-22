@@ -14,7 +14,7 @@ const atualizarResultados = async (partidaId, placares) => {
 		users[i] = { _id: users[i]._id }
 		users[i].totalAcumulado = 0
 		users[i].classificacao = 0
-		users[i].classificacaoAnterior = 0
+		users[i].classificacaoAnterior = undefined
 		users[i].placarCheio = 0
 		users[i].placarTimeVencedorComGol = 0
 		users[i].placarTimeVencedor = 0
