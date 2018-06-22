@@ -43,6 +43,7 @@ const atualizarResultados = async (partidaId, placares) => {
 				let palpite = findPalpite(users[j].palpites, partida)
 				if (palpite != null) {
 					palpite.classificacao = users[j].classificacao
+					palpite.classificacaoAnterior = users[j].classificacaoAnterior
 				}
 			}
 		}
