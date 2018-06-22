@@ -14,7 +14,7 @@ const atualizarResultados = async (partidaId, placares) => {
 		users[i] = { _id: users[i]._id }
 		users[i].totalAcumulado = 0
 		users[i].classificacao = 0
-		users[i].classificacaoAnterior = undefined
+		users[i].classificacaoAnterior = 1
 		users[i].placarCheio = 0
 		users[i].placarTimeVencedorComGol = 0
 		users[i].placarTimeVencedor = 0
@@ -101,7 +101,7 @@ const classificar = (users, index) => {
 				mesmoplacar = 1
 			}
 		}
-		users[i].classificacaoAnterior = index > 0 ? users[i].classificacao : undefined
+		users[i].classificacaoAnterior = index > 0 ? users[i].classificacao : 1
 		users[i].classificacao = cla
 	}
 	return users
