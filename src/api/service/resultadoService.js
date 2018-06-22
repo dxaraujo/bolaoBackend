@@ -7,6 +7,7 @@ const atualizarResultados = async (partidaId, placares) => {
 
 	const newPartida = await Partida.findByIdAndUpdate(partidaId, placares, { new: true })
 	const partidas = await Partida.find({}).sort({ order: 'asc' })
+	const allPalpites = await Palpite.find({}).sort({ 'partida.order': 'asc' })
 	let users = await User.find({})
 
 	// Montando os dados dos usuários
@@ -19,7 +20,7 @@ const atualizarResultados = async (partidaId, placares) => {
 		users[i].placarTimeVencedorComGol = 0
 		users[i].placarTimeVencedor = 0
 		users[i].placarGol = 0
-		users[i].palpites = await Palpite.find({ user: users[i]._id }).sort({ 'partida.order': 'asc' })
+		users[i].palpites = allPalpites.filter(palpite => palpite.user === user._id)
 	})
 
 	// Calculando os pontos acertados
