@@ -56,6 +56,7 @@ const atualizarResultados = async (partidaId, placares) => {
 				totalPontosObitidos: palpites[j].totalPontosObitidos,
 				totalAcumulado: palpites[j].totalAcumulado,
 				classificacao: palpites[j].classificacao,
+				classificacaoAnterior: palpites[j].classificacaoAnterior,
 				placarCheio: palpites[j].placarCheio,
 				placarTimeVencedorComGol: palpites[j].placarTimeVencedorComGol,
 				placarTimeVencedor: palpites[j].placarTimeVencedor,
