@@ -60,7 +60,7 @@ const login = (req, res) => {
 			user.password = null
 			user.avatar = null
 			user.contentType = null
-			const token = jwt.sign(user.toJSON(), env.authSecret, { expiresIn: "1 day" })
+			const token = jwt.sign(user.toJSON(), env.authSecret, { expiresIn: "30 days" })
 			res.json({ token })
 		} else {
 			return res.status(400).send({
