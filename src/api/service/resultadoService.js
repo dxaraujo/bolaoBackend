@@ -11,16 +11,17 @@ const atualizarResultados = async (partidaId, placares) => {
 	let users = await User.find({})
 
 	// Montando os dados dos usuários
+	console.log('allPalpites: ', allPalpites.length)
 	await asyncForEach(users, async (user, i, users) => {
 		users[i] = { _id: users[i]._id }
 		users[i].totalAcumulado = 0
 		users[i].classificacao = 0
-		users[i].classificacaoAnterior = undefined
+		users[i].classificacaoAnterior = 0
 		users[i].placarCheio = 0
 		users[i].placarTimeVencedorComGol = 0
 		users[i].placarTimeVencedor = 0
 		users[i].placarGol = 0
-		users[i].palpites = allPalpites.filter(palpite => palpite.user === user._id)
+		users[i].palpites = allPalpites.filter(palpite => palpite.user.equals(users[i]._id))
 	})
 
 	// Calculando os pontos acertados
@@ -102,7 +103,7 @@ const classificar = (users, index) => {
 				mesmoplacar = 1
 			}
 		}
-		users[i].classificacaoAnterior = index > 0 ? users[i].classificacao : undefined
+		users[i].classificacaoAnterior = index > 0 ? users[i].classificacao : 0
 		users[i].classificacao = cla
 	}
 	return users
