@@ -55,7 +55,7 @@ router.get('/:user/:fase/montarpalpites', async (req, res, next) => {
 	try {
 		const fase = await Fase.findById(faseId);
 		let partidas = await Partida.find({ fase: fase.nome }).sort({ order: 'asc' })
-		const palpites = await Palpite.find({ user, fase: fase.nome })
+		let palpites = await Palpite.find({ user, fase: fase.nome })
 		if (!palpites.length) {
 			partidas.forEach(partida => {
 				delete partida.placarTimeA
