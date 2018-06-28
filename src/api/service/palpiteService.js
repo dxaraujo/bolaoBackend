@@ -6,7 +6,7 @@ const { respondOrErr, respondSuccess, respondErr, handlerError } = require('../.
 
 const router = express.Router()
 
-router.get('/', (req, res, next) => {
+router.get('/', async (req, res, next) => {
 	Palpite.find(req.query, (err, data) => {
 		respondOrErr(res, next, 500, err, 200, { data })
 	})
