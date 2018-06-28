@@ -49,7 +49,7 @@ router.put('/:user/updatePalpites', (req, res, next) => {
 	}
 })
 
-router.get('/:user/:fase/montarpalpites', (req, res, next) => {
+router.get('/:user/:fase/montarpalpites', async (req, res, next) => {
 	const user = req.params.user
 	const faseId = req.params.fase
 	try {
