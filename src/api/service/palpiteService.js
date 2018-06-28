@@ -68,7 +68,6 @@ router.get('/:user/:fase/montarpalpites', async (req, res, next) => {
 			palpites = await Palpite.insertMany(palpites)
 		}
 		const grupos = montarPalpites(palpites)
-		console.log(grupos)
 		respondSuccess(res, 200, { data: grupos })
 	} catch (err) {
 		respondErr(next, 500, err)
