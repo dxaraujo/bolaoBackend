@@ -7,9 +7,12 @@ const { respondOrErr, respondSuccess, respondErr, handlerError } = require('../.
 const router = express.Router()
 
 router.get('/', async (req, res, next) => {
-	Palpite.find(req.query, (err, data) => {
-		respondOrErr(res, next, 500, err, 200, { data })
-	})
+	try {
+		const palpites = await Palpite.find(req.query).sort({ 'partida.order': 'asc' })
+		respondSuccess(res, 200, { data: palpites })
+	} catch (err) {
+		respondErr(next, 500, err)
+	}
 })
 
 router.get('/:id', (req, res, next) => {
