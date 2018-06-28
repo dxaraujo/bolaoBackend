@@ -49,13 +49,14 @@ router.put('/:user/updatePalpites', (req, res, next) => {
 	}
 })
 
-router.get('/:user/:fase/montarpalpites', (req, res, next) => {
+router.get('/:user/:fase/montarpalpites', async (req, res, next) => {
 	const user = req.params.user
 	const faseId = req.params.fase
-	Palpite.find({ user }).then(async palpites => {
+	try {
 		const fase = await Fase.findById(faseId);
 		let partidas = await Partida.find({ fase: fase.nome }).sort({ order: 'asc' })
-		if (!palpites.length) {
+		let palpites = await Palpite.find({ user, 'partida.fase': fase.nome })
+		if (palpites.length === 0) {
 			partidas.forEach(partida => {
 				delete partida.placarTimeA
 				delete partida.placarTimeB
@@ -64,10 +65,11 @@ router.get('/:user/:fase/montarpalpites', (req, res, next) => {
 			palpites = await Palpite.insertMany(palpites)
 		}
 		const grupos = montarPalpites(palpites)
+		console.log(grupos)
 		respondSuccess(res, 200, { data: grupos })
-	}).catch(err => {
+	} catch (err) {
 		respondErr(next, 500, err)
-	})
+	}
 })
 
 const montarPalpites = (palpites) => {
