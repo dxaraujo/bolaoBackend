@@ -6,10 +6,13 @@ const { respondOrErr, respondSuccess, respondErr, handlerError } = require('../.
 
 const router = express.Router()
 
-router.get('/', (req, res, next) => {
-	Palpite.find(req.query, (err, data) => {
-		respondOrErr(res, next, 500, err, 200, { data })
-	})
+router.get('/', async (req, res, next) => {
+	try {
+		const palpites = await Palpite.find(req.query).sort({ 'partida.order': 'asc' })
+		respondSuccess(res, 200, { data: palpites })
+	} catch (err) {
+		respondErr(next, 500, err)
+	}
 })
 
 router.get('/:id', (req, res, next) => {
@@ -55,8 +58,8 @@ router.get('/:user/:fase/montarpalpites', async (req, res, next) => {
 	try {
 		const fase = await Fase.findById(faseId);
 		let partidas = await Partida.find({ fase: fase.nome }).sort({ order: 'asc' })
-		let palpites = await Palpite.find({ user, fase: fase.nome })
-		if (!palpites.length) {
+		let palpites = await Palpite.find({ user, 'partida.fase': fase.nome })
+		if (palpites.length === 0) {
 			partidas.forEach(partida => {
 				delete partida.placarTimeA
 				delete partida.placarTimeB
