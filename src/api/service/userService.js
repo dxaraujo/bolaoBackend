@@ -35,7 +35,7 @@ router.get('/', async (req, res, next) => {
 			})
 			let fase = ''
 			palpites.forEach(palpite => {
-				if (palpite.fase != fase) {
+				if (palpite.partida.fase !== fase) {
 					console.log('---------------------------------------------------------------------------')
 					console.log(`${palpite.partida.fase}`)
 					console.log('---------------------------------------------------------------------------')
