@@ -5,24 +5,13 @@ const userSchema = new mongoose.Schema({
 		type: String,
 		required: true
 	},
-	username: {
+	email: {
 		type: String,
 		required: true
 	},
-	password: {
+	picture: {
 		type: String,
-		min: 6,
-		max: 20,
 		required: true
-	},
-	avatar: Buffer,
-	contentType: {
-		type: String,
-		required: false
-	},
-	facebookId: {
-		type: String,
-		required: false
 	},
 	placarCheio: {
 		type: Number,
@@ -60,6 +49,11 @@ const userSchema = new mongoose.Schema({
 		default: 0
 	},
 	isAdmin: {
+		type: Boolean,
+		required: true,
+		default: false
+	},
+	ativo: {
 		type: Boolean,
 		required: true,
 		default: false

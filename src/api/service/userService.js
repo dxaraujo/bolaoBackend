@@ -13,39 +13,34 @@ router.get('/', async (req, res, next) => {
 	User.find(req.query).then(async users => {
 		const fases = await Fase.find({ status: 'B' })
 		for (let i = 0; i < users.length; i++) {
-			// await fetch(`https://graph.facebook.com/${users[i].facebookId}/picture?width=${500}&height=${500}`).then(res => res.buffer()).then(async buffer => {
-			// 	users[i].avatar = buffer
-			// 	users[i].contentType = fileType(buffer).mime
-			// 	delete users[i].palpites
-			// 	await users[i].save()
-			// })
-			console.log('###########################################################################')
-			console.log(`APOSTAS DE ${users[i].name}`)
-			console.log('###########################################################################')
-			let palpites = await Palpite.find({ user: users[i]._id }).sort({ 'partida.order': 'asc' })
-			palpites = palpites.filter(palpite => {
-				let result = false
-				for (let j = 0; j < fases.length; j++) {
-					if (fases[j].nome === palpite.partida.fase) {
-						result = true
-						break
+			if (users[i].ativo) {
+				console.log('###########################################################################')
+				console.log(`APOSTAS DE ${users[i].name}`)
+				console.log('###########################################################################')
+				let palpites = await Palpite.find({ user: users[i]._id }).sort({ 'partida.order': 'asc' })
+				palpites = palpites.filter(palpite => {
+					let result = false
+					for (let j = 0; j < fases.length; j++) {
+						if (fases[j].nome === palpite.partida.fase) {
+							result = true
+							break
+						}
 					}
-				}
-				return result
-			})
-			let fase = ''
-			palpites.forEach(palpite => {
-				if (palpite.partida.fase !== fase) {
-					console.log('---------------------------------------------------------------------------')
-					console.log(`${palpite.partida.fase}`)
-					console.log('---------------------------------------------------------------------------')
-					console.log('Data                 Seleção 1            Placar           Seleção 2')
-					fase = palpite.partida.fase
-				}
-				console.log(`${moment(palpite.partida.data).add(3, 'hours').format('DD/MM/YYYY hh:mm').padEnd(20)} ${palpite.partida.timeA.nome.padEnd(20)} ${palpite.placarTimeA != null ? palpite.placarTimeA : ' '} x ${palpite.placarTimeB != null ? palpite.placarTimeB : ' '}            ${palpite.partida.timeB.nome}`)
-			})
-			console.log('')
-			users[i].set('palpites', palpites)
+					return result
+				})
+				let fase = ''
+				palpites.forEach(palpite => {
+					if (palpite.partida.fase !== fase) {
+						console.log('---------------------------------------------------------------------------')
+						console.log(`${palpite.partida.fase}`)
+						console.log('---------------------------------------------------------------------------')
+						console.log('Data                 Seleção 1            Placar           Seleção 2')
+						fase = palpite.partida.fase
+					}
+					console.log(`${moment(palpite.partida.data).add(3, 'hours').format('DD/MM/YYYY hh:mm').padEnd(20)} ${palpite.partida.timeA.nome.padEnd(20)} ${palpite.placarTimeA != null ? palpite.placarTimeA : ' '} x ${palpite.placarTimeB != null ? palpite.placarTimeB : ' '}            ${palpite.partida.timeB.nome}`)
+				})
+				users[i].set('palpites', palpites)
+			}
 		}
 		respondSuccess(res, 200, { data: users })
 	}).catch(err => {
@@ -66,7 +61,7 @@ router.post('/', (req, res, next) => {
 })
 
 router.put('/:id', (req, res, next) => {
-	User.findByIdAndUpdate(req.params.id, { isAdmin: req.body.isAdmin }, { new: true }, (err, data) => {
+	User.findByIdAndUpdate(req.params.id, { isAdmin: req.body.isAdmin, ativo: req.body.ativo }, { new: true }, (err, data) => {
 		respondOrErr(res, next, 500, err, 200, { data })
 	})
 })

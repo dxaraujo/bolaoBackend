@@ -8,10 +8,9 @@ const atualizarResultados = async (partidaId, placares) => {
 	const newPartida = await Partida.findByIdAndUpdate(partidaId, placares, { new: true })
 	const partidas = await Partida.find({}).sort({ order: 'asc' })
 	const allPalpites = await Palpite.find({}).sort({ 'partida.order': 'asc' })
-	let users = await User.find({})
+	let users = await User.find({ ativo: true })
 
 	// Montando os dados dos usuários
-	console.log('allPalpites: ', allPalpites.length)
 	await asyncForEach(users, async (user, i, users) => {
 		users[i] = { _id: users[i]._id }
 		users[i].totalAcumulado = 0
