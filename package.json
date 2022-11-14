@@ -11,6 +11,7 @@
 		"express": "^4.16.3",
 		"express-query-int": "^3.0.0",
 		"file-type": "^8.0.0",
+		"google-auth-library": "^8.7.0",
 		"jsdom": "^11.11.0",
 		"jsonwebtoken": "^8.2.1",
 		"moment": "^2.22.2",
@@ -22,7 +23,7 @@
 		"nodemon": "^1.17.4"
 	},
 	"scripts": {
-		"dev": "nodemon"
+		"start": "nodemon"
 	},
 	"packageManager": "yarn@1.22.19"
 }
