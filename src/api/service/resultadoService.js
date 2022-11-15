@@ -26,7 +26,9 @@ const atualizarResultados = async (partidaId, placares) => {
 	// Calculando os pontos acertados
 	for (let i = 0; i < partidas.length; i++) {
 		const partida = partidas[i]
-		if (partida.placarTimeA >= 0 && partida.placarTimeB >= 0) {
+		const testPlacarA = partida.placarTimeA && partida.placarTimeA !== null && partida.placarTimeA >= 0
+		const testPlacarB = partida.placarTimeB && partida.placarTimeB !== null && partida.placarTimeB >= 0
+		if (testPlacarA && testPlacarB) {
 			for (let j = 0; j < users.length; j++) {
 				let palpite = findPalpite(users[j].palpites, partida)
 				if (palpite != null) {
@@ -109,7 +111,9 @@ const classificar = (users, index) => {
 }
 
 const calcularPontuacaoPalpite = (palpite, partida) => {
-	if (palpite.placarTimeA >= 0 && palpite.placarTimeB >= 0) {
+	const testPlacarA = palpite.placarTimeA && palpite.placarTimeA !== null && palpite.placarTimeA >= 0
+	const testPlacarB = palpite.placarTimeB && palpite.placarTimeB !== null && palpite.placarTimeB >= 0
+	if (testPlacarA && testPlacarB) {
 		const palpiteTimeVencedor = palpite.placarTimeA > palpite.placarTimeB ? 'A' : palpite.placarTimeB > palpite.placarTimeA ? 'B' : 'E'
 		const partidaTimeVencedor = partida.placarTimeA > partida.placarTimeB ? 'A' : partida.placarTimeB > partida.placarTimeA ? 'B' : 'E'
 		if (palpite.placarTimeA === partida.placarTimeA && palpite.placarTimeB === partida.placarTimeB) {
@@ -145,6 +149,12 @@ const calcularPontuacaoPalpite = (palpite, partida) => {
 			palpite.placarTimeVencedor = false
 			palpite.placarGol = false
 		}
+	} else {
+		palpite.totalPontosObitidos = 0
+		palpite.placarCheio = false
+		palpite.placarTimeVencedorComGol = false
+		palpite.placarTimeVencedor = false
+		palpite.placarGol = false
 	}
 	return palpite
 }
