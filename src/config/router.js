@@ -6,7 +6,7 @@ const { authService, faseService, palpiteService, partidaService, timeService, u
  */
 const oapi = express.Router()
 
-oapi.post('/healthcheck', healthService)
+oapi.get('/healthcheck', healthService.healthcheck)
 oapi.post('/registerGoogleUser', authService.registerGoogleUser)
 
 /**
