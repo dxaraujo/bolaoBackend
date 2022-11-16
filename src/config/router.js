@@ -1,10 +1,12 @@
 const express = require('express')
-const { authService, faseService, palpiteService, partidaService, timeService, userService } = require('../api')
+const { authService, faseService, palpiteService, partidaService, timeService, userService, healthService } = require('../api')
 
 /*
  * Rotas abertas
  */
 const oapi = express.Router()
+
+oapi.post('/healthcheck', healthService)
 oapi.post('/registerGoogleUser', authService.registerGoogleUser)
 
 /**
