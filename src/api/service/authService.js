@@ -25,6 +25,7 @@ const auth = (req, res, next) => {
 					errors: ['Failed to authenticate token.']
 				})
 			} else {
+				req.token = decoded
 				next()
 			}
 		})

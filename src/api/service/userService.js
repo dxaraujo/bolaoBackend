@@ -9,6 +9,12 @@ const { respondOrErr, respondErr, respondSuccess, handlerError } = require('../.
 
 const router = express.Router()
 
+router.get('/authenticated', async (req, res, next) => {
+	User.findById(req.token._id, (err, data) => {
+		respondOrErr(res, next, 500, err, 200, { data })
+	});
+})
+
 router.get('/', async (req, res, next) => {
 	User.find(req.query).then(async users => {
 		const fases = await Fase.find({ status: 'B' })
