@@ -1,5 +1,3 @@
-//const fetch = require('node-fetch');
-//const fileType = require('file-type');
 const express = require('express')
 const moment = require('moment')
 const User = require('../model/user')

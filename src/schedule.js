@@ -1,6 +1,6 @@
 const schedule = require('node-schedule')
+const fetch = require('node-fetch')
 const moment = require('moment')
-const { JSDOM } = require('jsdom')
 const Partida = require('./api/model/partida')
 const atualizarResultados = require('./api/service/resultadoService')
 
