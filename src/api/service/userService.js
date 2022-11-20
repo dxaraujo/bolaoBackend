@@ -43,8 +43,9 @@ router.get('/', async (req, res, next) => {
 				// 		console.log('Data                 Seleção 1            Placar           Seleção 2')
 				// 		fase = palpite.partida.fase
 				// 	}
-				// 	console.log(`${moment(palpite.partida.data).add(3, 'hours').format('DD/MM/YYYY hh:mm').padEnd(20)} ${palpite.partida.timeA.nome.padEnd(20)} ${palpite.placarTimeA != null ? palpite.placarTimeA : ' '} x ${palpite.placarTimeB != null ? palpite.placarTimeB : ' '}            ${palpite.partida.timeB.nome}`)
+				// 	console.log(`${moment(palpite.partida.data).add(3, 'hours').format('DD/MM/YYYY HH:mm').padEnd(20)} ${palpite.partida.timeA.nome.padEnd(20)} ${palpite.placarTimeA != null ? palpite.placarTimeA : ' '} x ${palpite.placarTimeB != null ? palpite.placarTimeB : ' '}            ${palpite.partida.timeB.nome}`)
 				// })
+				// console.log('')
 				users[i].set('palpites', palpites)
 			}
 		}
