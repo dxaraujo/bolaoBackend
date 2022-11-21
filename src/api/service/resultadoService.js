@@ -113,7 +113,6 @@ const classificar = (users, index) => {
 const calcularPontuacaoPalpite = (palpite, partida) => {
 	const testPlacarA = palpite.placarTimeA !== undefined && palpite.placarTimeA !== null && palpite.placarTimeA >= 0
 	const testPlacarB = palpite.placarTimeB !== undefined && palpite.placarTimeB !== null && palpite.placarTimeB >= 0
-	console.log(`${testPlacarA} ${testPlacarB}`)
 	if (testPlacarA && testPlacarB) {
 		const palpiteTimeVencedor = palpite.placarTimeA > palpite.placarTimeB ? 'A' : palpite.placarTimeB > palpite.placarTimeA ? 'B' : 'E'
 		const partidaTimeVencedor = partida.placarTimeA > partida.placarTimeB ? 'A' : partida.placarTimeB > partida.placarTimeA ? 'B' : 'E'
