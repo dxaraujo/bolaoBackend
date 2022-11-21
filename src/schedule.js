@@ -48,13 +48,16 @@ schedule.scheduleJob('* 7-19 * * *', async () => {
 			const placarTimeB = jogos[i].time_2 ? jogos[i].time_2.gols : undefined
 			if (placarTimeA && placarTimeA >= 0 && placarTimeB && placarTimeB >= 0) {
 				const partida = partidas.find(partida => {
+					console.log(moment(horarioJogo, 'MMM DD YYYY hh:mm:ss:SSSA').subtract(3, 'hours'))
+					console.log(moment(partida.data, 'YYYY-MM-DDThh:mm:ss'))
+					console.log(moment(horarioJogo, 'MMM DD YYYY hh:mm:ss:SSSA').subtract(3, 'hours').isSame(moment(partida.data, 'YYYY-MM-DDThh:mm:ss')))
 					return partida.timeA && partida.timeA.sigla == siglaTimeA 
 						&& partida.timeB && partida.timeB.sigla == siglaTimeB
 						&& moment(horarioJogo, 'MMM DD YYYY hh:mm:ss:SSSA').subtract(3, 'hours').isSame(moment(partida.data, 'YYYY-MM-DDThh:mm:ss'))
 				})
 				if (partida != null) {
 					if (partida.placarTimeA != placarTimeA || partida.placarTimeB != placarTimeB) {
-						console.log(`Partida: ${partida.timeA.sigla} ${partida.placarTimeA | ' '} x ${partida.placarTimeB | ' '} ${partida.timeB.sigla} com placar desatualizado`)
+						console.log(`Partida: ${partida.timeA.sigla} ${partida.placarTimeA} x ${partida.placarTimeB} ${partida.timeB.sigla} com placar desatualizado`)
 						const newPartida = await atualizarResultados(partida._id, { placarTimeA, placarTimeB })
 						console.log(`Partida: ${newPartida.timeA.sigla} ${newPartida.placarTimeA} x ${newPartida.placarTimeB} ${newPartida.timeB.sigla} atualizada`)
 					}
