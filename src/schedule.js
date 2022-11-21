@@ -37,9 +37,9 @@ schedule.scheduleJob('*/5 7-19 * * *', async () => {
 		const date = moment().subtract(3, 'hours').toDate()
 		console.log('Data atual: ', date)
 		const partidas = await Partida.find({ data: { $lt: date } }).sort({ order: 'asc' })
-		// console.log(`Encontrou ${partidas.length} partidas`)
+		console.log(`Encontrou ${partidas.length} partidas`)
 		const jogos = obterJogos(data)
-		// console.log(`Encontrou ${jogos.length} jogos`)
+		console.log(`Encontrou ${jogos.length} jogos`)
 		for (let i = 0; i < jogos.length; i++) {
 			const horarioJogo = jogos[i].data
 			const siglaTimeA = jogos[i].time_1 ? jogos[i].time_1.sigla : undefined
