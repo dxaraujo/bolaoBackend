@@ -30,12 +30,12 @@ const obterJogos = (data) => {
 }
 
 schedule.scheduleJob('* 7-19 * * *', async () => {
-	console.log('iniciou a atualização dos resultados')
+	const date = moment().subtract(3, 'hours').toDate()
+	console.log(`Iniciou atualização dos resultados: ${date}`)
 	try {
+
 		const response = await fetch(URL)
 		const data = await response.json()
-		const date = moment().subtract(3, 'hours').toDate()
-		console.log('Data atual: ', date)
 		const partidas = await Partida.find({ data: { $lt: date } }).sort({ order: 'asc' })
 		console.log(`Encontrou ${partidas.length} partidas`)
 		const jogos = obterJogos(data)
@@ -61,7 +61,8 @@ schedule.scheduleJob('* 7-19 * * *', async () => {
 				}
 			}
 		}
-		console.log('finalizou a atualização dos resultados')
+		date = moment().subtract(3, 'hours').toDate()
+		console.log(`Finalizou atualização dos resultados: ${date}`)
 	} catch(err) {
 		console.log(err)
 	}
