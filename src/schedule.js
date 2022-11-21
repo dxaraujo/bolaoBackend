@@ -29,7 +29,7 @@ const obterJogos = (data) => {
 	return result
 }
 
-schedule.scheduleJob('*/5 7-19 * * *', async () => {
+schedule.scheduleJob('* 7-19 * * *', async () => {
 	console.log('iniciou a atualização dos resultados')
 	try {
 		const response = await fetch(URL)
