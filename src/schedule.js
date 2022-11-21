@@ -30,7 +30,7 @@ const obterJogos = (data) => {
 }
 
 schedule.scheduleJob('* 7-19 * * *', async () => {
-	const date = moment().subtract(3, 'hours').toDate()
+	let date = moment().subtract(3, 'hours').toDate()
 	console.log(`Iniciou atualização dos resultados: ${date}`)
 	try {
 
