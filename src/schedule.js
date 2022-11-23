@@ -4,7 +4,7 @@ const moment = require('moment')
 const Partida = require('./api/model/partida')
 const atualizarResultados = require('./api/service/resultadoService')
 
-const URL = 'https://www.estadao.com.br/pf/api/v3/content/fetch/esportes?query={"params":{"mode":"api"},"requestUri":"https://estadao.com.br/esportes/futebol/partidas/copa-do-mundo/2022"}&d=302&_website=estadao'
+const URL = 'https://www.estadao.com.br/pf/api/v3/content/fetch/esportes?query={%22params%22:{%22mode%22:%22api%22},%22requestUri%22:%22https://estadao.com.br/esportes/futebol/partidas/copa-do-mundo/2022%22}'
 
 const obterJogos = (data) => {
 	let result = []
@@ -33,13 +33,12 @@ schedule.scheduleJob('*/5 7-19 * * *', async () => {
 	let date = moment().subtract(3, 'hours').toDate()
 	console.log(`Iniciou atualização dos resultados: ${date}`)
 	try {
-
 		const response = await fetch(URL)
 		const data = await response.json()
-		const partidas = await Partida.find({ data: { $lt: date } }).sort({ order: 'asc' })
-		console.log(`Encontrou ${partidas.length} partidas`)
 		const jogos = obterJogos(data)
 		console.log(`Encontrou ${jogos.length} jogos`)
+		const partidas = await Partida.find({ data: { $lt: date } }).sort({ order: 'asc' })
+		console.log(`Encontrou ${partidas.length} partidas`)
 		for (let i = 0; i < jogos.length; i++) {
 			const horarioJogo = jogos[i].data
 			const siglaTimeA = jogos[i].time_1 ? jogos[i].time_1.sigla : undefined
