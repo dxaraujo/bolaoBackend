@@ -36,9 +36,9 @@ schedule.scheduleJob('*/5 7-19 * * *', async () => {
 		const response = await fetch(URL)
 		const data = await response.json()
 		const jogos = obterJogos(data)
-		console.log(`Encontrou ${jogos.length} jogos`)
+		// console.log(`Encontrou ${jogos.length} jogos`)
 		const partidas = await Partida.find({ data: { $lt: date } }).sort({ order: 'asc' })
-		console.log(`Encontrou ${partidas.length} partidas`)
+		// console.log(`Encontrou ${partidas.length} partidas`)
 		for (let i = 0; i < jogos.length; i++) {
 			const horarioJogo = jogos[i].data
 			const siglaTimeA = jogos[i].time_1 ? jogos[i].time_1.sigla : undefined
@@ -46,18 +46,20 @@ schedule.scheduleJob('*/5 7-19 * * *', async () => {
 			const placarTimeA = jogos[i].time_1 ? jogos[i].time_1.gols : undefined
 			const placarTimeB = jogos[i].time_2 ? jogos[i].time_2.gols : undefined
 			if (placarTimeA && placarTimeA >= 0 && placarTimeB && placarTimeB >= 0) {
-				console.log(`Achou jogo com placar ${siglaTimeA} ${placarTimeA} x ${placarTimeB} ${siglaTimeB}`)
+				// console.log(`Achou jogo com placar ${siglaTimeA} ${placarTimeA} x ${placarTimeB} ${siglaTimeB}`)
 				const partida = partidas.find(partida => {
 					return partida.timeA && partida.timeA.sigla == siglaTimeA 
 						&& partida.timeB && partida.timeB.sigla == siglaTimeB
 						&& moment(horarioJogo, 'MMM DD YYYY hh:mm:ss:SSSA').isSame(moment(partida.data, 'YYYY-MM-DDThh:mm:ss'))
 				})
 				if (partida != null) {
-					console.log(`Achou partida ${partida.timeA.sigla} ${partida.placarTimeA | ' '} x ${partida.placarTimeB | ' '} ${partida.timeB.sigla}`)
+					// console.log(`Achou partida ${partida.timeA.sigla} ${partida.placarTimeA | ' '} x ${partida.placarTimeB | ' '} ${partida.timeB.sigla}`)
 					if (partida.placarTimeA != placarTimeA || partida.placarTimeB != placarTimeB) {
-						console.log(`Partida com placar desatualizado`)
+						const partidaLog = `${partida.timeA.sigla} ${partida.placarTimeA | ' '} x ${partida.placarTimeB | ' '} ${partida.timeB.sigla}`
+						const jogoLog = `${siglaTimeA} ${placarTimeA} x ${placarTimeB} ${siglaTimeB}`
+						console.log(`Partida ${partidaLog} desatualizado, deveria estar ${jogoLog}`)
 						const newPartida = await atualizarResultados(partida._id, { placarTimeA, placarTimeB })
-						console.log(`Partida atualizada`)
+						console.log(`Partida atualizada: ${partidaLog}`)
 					}
 				}
 			}
