@@ -70,3 +70,7 @@ schedule.scheduleJob('*/5 7-19 * * *', async () => {
 		console.log(err)
 	}
 });
+
+process.on('SIGINT', function () { 
+	schedule.gracefulShutdown().then(() => process.exit(0))
+})
