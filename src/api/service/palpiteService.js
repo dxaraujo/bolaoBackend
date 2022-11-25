@@ -39,14 +39,15 @@ router.delete('/:id', (req, res, next) => {
 	})
 })
 
-router.put('/:user/updatePalpites', (req, res, next) => {
+router.put('/:user/updatePalpites', async (req, res, next) => {
 	try {
 		let palpites = []
-		req.body.forEach(async palpite => {
+		for (let i = 0; i < req.body.length; i++) {
+			let palpite = req.body[i]
 			palpite = await Palpite.findByIdAndUpdate(palpite._id, { placarTimeA: palpite.placarTimeA, placarTimeB: palpite.placarTimeB }, { new: true })
 			palpites.push(palpite)
-		})
-		respondSuccess(res, 200, { data: palpites })
+		}
+		respondSuccess(res, 200, { data: montarPalpites(palpites) })
 	} catch (err) {
 		respondErr(next, 500, err)
 	}
@@ -67,8 +68,7 @@ router.get('/:user/:fase/montarpalpites', async (req, res, next) => {
 			})
 			palpites = await Palpite.insertMany(palpites)
 		}
-		const grupos = montarPalpites(palpites)
-		respondSuccess(res, 200, { data: grupos })
+		respondSuccess(res, 200, { data: montarPalpites(palpites) })
 	} catch (err) {
 		respondErr(next, 500, err)
 	}
