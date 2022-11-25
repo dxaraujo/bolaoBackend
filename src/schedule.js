@@ -50,7 +50,7 @@ schedule.scheduleJob('*/5 7-19 * * *', async () => {
 				const partida = partidas.find(partida => {
 					return partida.timeA && partida.timeA.sigla == siglaTimeA 
 						&& partida.timeB && partida.timeB.sigla == siglaTimeB
-						&& moment(horarioJogo, 'MMM DD YYYY hh:mm:ss:SSSA').subtract(3, 'hours').isSame(moment(partida.data, 'YYYY-MM-DDThh:mm:ss'))
+						&& moment(horarioJogo, 'MMM DD YYYY hh:mm:ss:SSSA').isSame(moment(partida.data, 'YYYY-MM-DDThh:mm:ss'))
 				})
 				if (partida != null) {
 					console.log(`Achou partida ${partida.timeA.sigla} ${partida.placarTimeA | ' '} x ${partida.placarTimeB | ' '} ${partida.timeB.sigla}`)
