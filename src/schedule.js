@@ -7,7 +7,7 @@ const atualizarResultados = require('./api/service/resultadoService')
 const URL = 'https://www.estadao.com.br/pf/api/v3/content/fetch/content-api-copa-2022?query={"origin":"proximos-jogos"}&d=320&_website=estadao'
 
 schedule.gracefulShutdown().then(() => {
-	schedule.scheduleJob('* 7-20 * * *', async () => {
+	schedule.scheduleJob('*/5 7-20 * * *', async () => {
 		let date = moment().subtract(3, 'hours').toDate()
 		console.log(`Iniciou atualização dos resultados: ${date}`)
 		try {
@@ -23,17 +23,17 @@ schedule.gracefulShutdown().then(() => {
 				const placarTimeA = jogos[i].time1_gols
 				const placarTimeB = jogos[i].time2_gols
 				if (placarTimeA && placarTimeA >= 0 && placarTimeB && placarTimeB >= 0) {
-					console.log(`Achou jogo com placar ${siglaTimeA} ${placarTimeA} x ${placarTimeB} ${siglaTimeB}`)
+					// console.log(`Achou jogo com placar ${siglaTimeA} ${placarTimeA} x ${placarTimeB} ${siglaTimeB}`)
 					const partida = partidas.find(partida => {
-						console.log(moment(horarioJogo).subtract(3, 'hours'))
-						console.log(moment(partida.data, 'YYYY-MM-DDThh:mm:ss'))
-						console.log(moment(horarioJogo).isSame(moment(partida.data, 'YYYY-MM-DDThh:mm:ss')))
+						// console.log(moment(horarioJogo).subtract(3, 'hours'))
+						// console.log(moment(partida.data, 'YYYY-MM-DDThh:mm:ss'))
+						// console.log(moment(horarioJogo).isSame(moment(partida.data, 'YYYY-MM-DDThh:mm:ss')))
 						return partida.timeA && partida.timeA.sigla == siglaTimeA 
 							&& partida.timeB && partida.timeB.sigla == siglaTimeB
 							&& moment(horarioJogo).isSame(moment(partida.data, 'YYYY-MM-DDThh:mm:ss'))
 					})
 					if (partida != null) {
-						console.log(`Achou partida ${partida.timeA.sigla} ${partida.placarTimeA | ' '} x ${partida.placarTimeB | ' '} ${partida.timeB.sigla}`)
+						// console.log(`Achou partida ${partida.timeA.sigla} ${partida.placarTimeA | ' '} x ${partida.placarTimeB | ' '} ${partida.timeB.sigla}`)
 						if (partida.placarTimeA != placarTimeA || partida.placarTimeB != placarTimeB) {
 							const partidaLog = `${partida.timeA.sigla} ${partida.placarTimeA | ' '} x ${partida.placarTimeB | ' '} ${partida.timeB.sigla}`
 							const jogoLog = `${siglaTimeA} ${placarTimeA} x ${placarTimeB} ${siglaTimeB}`
