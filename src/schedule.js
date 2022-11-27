@@ -20,8 +20,8 @@ schedule.gracefulShutdown().then(() => {
 				const horarioJogo = jogos[i].data
 				const siglaTimeA = jogos[i].time1_nome_min
 				const siglaTimeB = jogos[i].time2_nome_min
-				const placarTimeA = jogos[i].time1_gols
-				const placarTimeB = jogos[i].time2_gols
+				const placarTimeA = Number(jogos[i].time1_gols)
+				const placarTimeB = Number(jogos[i].time2_gols)
 				if (placarTimeA && placarTimeA >= 0 && placarTimeB && placarTimeB >= 0) {
 					console.log(`Achou jogo com placar ${siglaTimeA} ${placarTimeA} x ${placarTimeB} ${siglaTimeB}`)
 					const partida = partidas.find(partida => {
@@ -30,7 +30,7 @@ schedule.gracefulShutdown().then(() => {
 						console.log(moment(horarioJogo).isSame(moment(partida.data, 'YYYY-MM-DDThh:mm:ss')))
 						return partida.timeA && partida.timeA.sigla == siglaTimeA 
 							&& partida.timeB && partida.timeB.sigla == siglaTimeB
-							&& moment(horarioJogo).subtract(3, 'hours').isSame(moment(partida.data, 'YYYY-MM-DDThh:mm:ss'))
+							&& moment(horarioJogo).subtract(3, 'hours').isSame(moment(partida.data, 'YYYY-MM-DDThh:mm:ss').add(3, 'hours'))
 					})
 					if (partida != null) {
 						console.log(`Achou partida ${partida.timeA.sigla} ${partida.placarTimeA | ' '} x ${partida.placarTimeB | ' '} ${partida.timeB.sigla}`)
