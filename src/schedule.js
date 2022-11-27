@@ -26,11 +26,11 @@ schedule.gracefulShutdown().then(() => {
 					console.log(`Achou jogo com placar ${siglaTimeA} ${placarTimeA} x ${placarTimeB} ${siglaTimeB}`)
 					const partida = partidas.find(partida => {
 						console.log(moment(horarioJogo))
-						console.log(moment(partida.data, 'YYYY-MM-DDThh:mm:ss'))
+						console.log(moment(partida.data, 'YYYY-MM-DDThh:mm:ss').add(3, 'hours'))
 						console.log(moment(horarioJogo).isSame(moment(partida.data, 'YYYY-MM-DDThh:mm:ss')))
 						return partida.timeA && partida.timeA.sigla == siglaTimeA 
 							&& partida.timeB && partida.timeB.sigla == siglaTimeB
-							&& moment(horarioJogo).isSame(moment(partida.data, 'YYYY-MM-DDThh:mm:ss'))
+							&& moment(horarioJogo).isSame(moment(partida.data, 'YYYY-MM-DDThh:mm:ss').add(3, 'hours'))
 					})
 					if (partida != null) {
 						console.log(`Achou partida ${partida.timeA.sigla} ${partida.placarTimeA | ' '} x ${partida.placarTimeB | ' '} ${partida.timeB.sigla}`)
