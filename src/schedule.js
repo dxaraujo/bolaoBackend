@@ -33,7 +33,7 @@ schedule.gracefulShutdown().then(() => {
 							&& moment(horarioJogo).isSame(moment(partida.data, 'YYYY-MM-DDThh:mm:ss'))
 					})
 					if (partida != null) {
-						// console.log(`Achou partida ${partida.timeA.sigla} ${partida.placarTimeA | ' '} x ${partida.placarTimeB | ' '} ${partida.timeB.sigla}`)
+						console.log(`Achou partida ${partida.timeA.sigla} ${partida.placarTimeA | ' '} x ${partida.placarTimeB | ' '} ${partida.timeB.sigla}`)
 						if (partida.placarTimeA != placarTimeA || partida.placarTimeB != placarTimeB) {
 							const partidaLog = `${partida.timeA.sigla} ${partida.placarTimeA | ' '} x ${partida.placarTimeB | ' '} ${partida.timeB.sigla}`
 							const jogoLog = `${siglaTimeA} ${placarTimeA} x ${placarTimeB} ${siglaTimeB}`
