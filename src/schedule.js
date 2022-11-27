@@ -7,7 +7,7 @@ const atualizarResultados = require('./api/service/resultadoService')
 const URL = 'https://www.estadao.com.br/pf/api/v3/content/fetch/content-api-copa-2022?query={"origin":"proximos-jogos"}&d=320&_website=estadao'
 
 schedule.gracefulShutdown().then(() => {
-	schedule.scheduleJob('* 7-20 * * *', async () => {
+	schedule.scheduleJob('*/3 7-20 * * *', async () => {
 		let date = moment().subtract(3, 'hours').toDate()
 		console.log(`Iniciou atualização dos resultados: ${date}`)
 		try {
