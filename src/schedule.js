@@ -7,7 +7,7 @@ const atualizarResultados = require('./api/service/resultadoService')
 const URL = 'https://www.estadao.com.br/pf/api/v3/content/fetch/content-api-copa-2022?query={"origin":"proximos-jogos"}&d=320&_website=estadao'
 
 schedule.gracefulShutdown().then(() => {
-	schedule.scheduleJob('*/3 7-20 * * *', async () => {
+	schedule.scheduleJob('* 7-20 * * *', async () => {
 		let date = moment().subtract(3, 'hours').toDate()
 		console.log(`Iniciou atualização dos resultados: ${date}`)
 		try {
@@ -25,12 +25,16 @@ schedule.gracefulShutdown().then(() => {
 				if (placarTimeA !== undefined && placarTimeA >= 0 && placarTimeB !== undefined && placarTimeB >= 0) {
 					console.log(`Achou jogo com placar ${siglaTimeA} ${placarTimeA} x ${placarTimeB} ${siglaTimeB}`)
 					const partida = partidas.find(partida => {
-						// console.log(moment(horarioJogo).subtract(3, 'hours'))
-						// console.log(moment(partida.data, 'YYYY-MM-DDThh:mm:ss'))
-						// console.log(moment(horarioJogo).isSame(moment(partida.data, 'YYYY-MM-DDThh:mm:ss')))
+						if (partida.timeA && partida.timeA.sigla == siglaTimeA && partida.timeB && partida.timeB.sigla == siglaTimeB) {
+							console.log(partida.timeA.nome)
+							console.log(partida.timeB.nome)
+							console.log(moment(horarioJogo).subtract(3, 'hours'))
+							console.log(moment(partida.data, 'YYYY-MM-DDThh:mm:ss'))
+							console.log(moment(horarioJogo).subtract(3, 'hours').isSame(moment(partida.data, 'YYYY-MM-DDThh:mm:ss')))
+						}
 						return partida.timeA && partida.timeA.sigla == siglaTimeA 
 							&& partida.timeB && partida.timeB.sigla == siglaTimeB
-							&& moment(horarioJogo).subtract(3, 'hours').isSame(moment(partida.data, 'YYYY-MM-DDThh:mm:ss').add(3, 'hours'))
+							&& moment(horarioJogo).subtract(3, 'hours').isSame(moment(partida.data, 'YYYY-MM-DDThh:mm:ss'))
 					})
 					if (partida != null) {
 						console.log(`Achou partida ${partida.timeA.sigla} ${partida.placarTimeA | ' '} x ${partida.placarTimeB | ' '} ${partida.timeB.sigla}`)
