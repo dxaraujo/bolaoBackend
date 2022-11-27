@@ -7,7 +7,7 @@ const atualizarResultados = require('./api/service/resultadoService')
 const URL = 'https://www.estadao.com.br/pf/api/v3/content/fetch/content-api-copa-2022?query={"origin":"proximos-jogos"}&d=320&_website=estadao'
 
 schedule.gracefulShutdown().then(() => {
-	schedule.scheduleJob('*/5 7-20 * * *', async () => {
+	schedule.scheduleJob('* 7-20 * * *', async () => {
 		let date = moment().subtract(3, 'hours').toDate()
 		console.log(`Iniciou atualização dos resultados: ${date}`)
 		try {
@@ -20,9 +20,9 @@ schedule.gracefulShutdown().then(() => {
 				const horarioJogo = jogos[i].data
 				const siglaTimeA = jogos[i].time1_nome_min
 				const siglaTimeB = jogos[i].time2_nome_min
-				const placarTimeA = Number(jogos[i].time1_gols)
-				const placarTimeB = Number(jogos[i].time2_gols)
-				if (placarTimeA && placarTimeA >= 0 && placarTimeB && placarTimeB >= 0) {
+				const placarTimeA = jogos[i].time1_gols ? parseInt(jogos[i].time1_gols) : undefined
+				const placarTimeB = jogos[i].time2_gols ? parseInt(jogos[i].time2_gols) : undefined
+				if (placarTimeA !== undefined && placarTimeA >= 0 && placarTimeB !== undefined && placarTimeB >= 0) {
 					console.log(`Achou jogo com placar ${siglaTimeA} ${placarTimeA} x ${placarTimeB} ${siglaTimeB}`)
 					const partida = partidas.find(partida => {
 						console.log(moment(horarioJogo).subtract(3, 'hours'))
