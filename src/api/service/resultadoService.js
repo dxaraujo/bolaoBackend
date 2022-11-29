@@ -1,11 +1,13 @@
 const Partida = require('../model/partida')
 const Palpite = require('../model/palpite')
+const Config = require('../model/config')
 const User = require('../model/user')
 const { asyncForEach } = require('../../util/serviceUtils')
 
 const atualizarResultados = async (partidaId, { placarTimeA, placarTimeB }) => {
 
 	console.log(`Atualizando resultado 'partida._id': ${partidaId}, placarTimeA: ${placarTimeA}, placarTimeB: ${placarTimeB}`)
+	await Config.updateMany({}, { atualizandoPontuacoes: true })
 	const newPartida = await Partida.findByIdAndUpdate(partidaId, { placarTimeA, placarTimeB }, { new: true })
 	const partidas = await Partida.find({}).sort({ order: 'asc' })
 	const allPalpites = await Palpite.find({}).sort({ 'partida.order': 'asc' })
@@ -79,6 +81,7 @@ const atualizarResultados = async (partidaId, { placarTimeA, placarTimeB }) => {
 	})
 
 	console.log(`Partida atualizada 'partida._id': ${newPartida._id}, placarTimeA: ${newPartida.placarTimeA}, placarTimeB: ${newPartida.placarTimeB}`)
+	await Config.updateMany({}, { atualizandoPontuacoes: false })
 	return newPartida
 }
 
