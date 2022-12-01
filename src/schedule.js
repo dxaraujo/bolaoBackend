@@ -25,13 +25,13 @@ schedule.gracefulShutdown().then(() => {
 				if (placarTimeA !== undefined && placarTimeA >= 0 && placarTimeB !== undefined && placarTimeB >= 0) {
 					console.log(`Achou jogo com placar ${siglaTimeA} ${placarTimeA} x ${placarTimeB} ${siglaTimeB}`)
 					const partida = partidas.find(partida => {
-						if (partida.timeA && partida.timeA.sigla == siglaTimeA && partida.timeB && partida.timeB.sigla == siglaTimeB) {
-							console.log(partida.timeA.nome)
-							console.log(partida.timeB.nome)
-							console.log(moment(horarioJogo).subtract(3, 'hours'))
-							console.log(moment(partida.data, 'YYYY-MM-DDThh:mm:ss'))
-							console.log(moment(horarioJogo).subtract(3, 'hours').isSame(moment(partida.data, 'YYYY-MM-DDThh:mm:ss')))
-						}
+						// if (partida.timeA && partida.timeA.sigla == siglaTimeA && partida.timeB && partida.timeB.sigla == siglaTimeB) {
+						// 	console.log(partida.timeA.nome)
+						// 	console.log(partida.timeB.nome)
+						// 	console.log(moment(horarioJogo).subtract(3, 'hours'))
+						// 	console.log(moment(partida.data, 'YYYY-MM-DDThh:mm:ss'))
+						// 	console.log(moment(horarioJogo).subtract(3, 'hours').isSame(moment(partida.data, 'YYYY-MM-DDThh:mm:ss')))
+						// }
 						return partida.timeA && partida.timeA.sigla == siglaTimeA 
 							&& partida.timeB && partida.timeB.sigla == siglaTimeB
 							&& moment(horarioJogo).subtract(3, 'hours').isSame(moment(partida.data, 'YYYY-MM-DDThh:mm:ss'))
