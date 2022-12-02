@@ -4,7 +4,7 @@ const moment = require('moment')
 const Partida = require('./api/model/partida')
 const atualizarResultados = require('./api/service/resultadoService')
 
-const URL = 'https://www.estadao.com.br/pf/api/v3/content/fetch/content-api-copa-2022?query={"origin":"tabela-jogos"}&d=342&_website=estadao'
+const URL = 'https://www.estadao.com.br/pf/api/v3/content/fetch/content-api-copa-2022?query={"origin":"tabela-jogos"}'
 
 schedule.gracefulShutdown().then(() => {
 	schedule.scheduleJob('* 7-20 * * *', async () => {
