@@ -7,7 +7,7 @@ const atualizarResultados = require('./api/service/resultadoService')
 const URL = 'https://www.estadao.com.br/pf/api/v3/content/fetch/content-api-copa-2022?query={"origin":"tabela-jogos"}'
 
 schedule.gracefulShutdown().then(() => {
-	schedule.scheduleJob('* 7-20 * * *', async () => {
+	schedule.scheduleJob('*/5 7-20 * * *', async () => {
 		let date = moment().subtract(3, 'hours').toDate()
 		console.log(`Iniciou atualização dos resultados: ${date}`)
 		try {
@@ -34,7 +34,7 @@ schedule.gracefulShutdown().then(() => {
 						// }
 						return partida.timeA && partida.timeA.sigla == siglaTimeA 
 							&& partida.timeB && partida.timeB.sigla == siglaTimeB
-							&& moment(horarioJogo).subtract(3, 'hours').isSame(moment(partida.data, 'YYYY-MM-DDThh:mm:ss'))
+							&& moment(horarioJogo).isSame(moment(partida.data, 'YYYY-MM-DDThh:mm:ss'))
 					})
 					if (partida != null) {
 						console.log(`Achou partida ${partida.timeA.sigla} ${partida.placarTimeA | ' '} x ${partida.placarTimeB | ' '} ${partida.timeB.sigla}`)
